@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Bsc_In_Stream_Conversion
@@ -10,11 +11,21 @@ namespace Bsc_In_Stream_Conversion
     public class DatabaseAccess
     {
         readonly String connString = "Host=hattie.db.elephantsql.com;Username=ipnajzyj;Password=ESeXjzWr6q1onkepNgbFiLzh8EQEm8pF;Database=ipnajzyj";
+
+        private Semaphore connectionPool = new Semaphore(5, 5);
+        
         private async Task<NpgsqlConnection> getConnection()
         {
+            connectionPool.WaitOne();
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
+            conn.Disposed += ReleaseSemaphore;
             return conn;
+        }
+
+        private void ReleaseSemaphore(object sender, EventArgs e)
+        {
+            connectionPool.Release();
         }
 
         public async Task<int> InsertUnitsAsync(IEnumerable<Unit> units)

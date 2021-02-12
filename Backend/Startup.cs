@@ -40,6 +40,7 @@ namespace Bsc_In_Stream_Conversion
             });
             services.AddTransient<IUnitConverter, UnitConverter>();
             services.AddSingleton<IMQTTClientManager, MQTTClientManager>();
+            services.AddSingleton<DatabaseAccess>();
             
             services.AddScoped<SocketRequestHandler>();
             Log.Logger = new LoggerConfiguration()

@@ -8,5 +8,7 @@ namespace Bsc_In_Stream_Conversion
     public interface IUnitConverter
     {
         Task<decimal> Convert(string fromSystemName, string toSystemName, decimal value);
+
+        Task<decimal> Convert(List<string> fromUnits, List<string> toUnits, decimal value);
     }
 }

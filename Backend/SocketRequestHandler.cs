@@ -12,7 +12,7 @@ namespace Bsc_In_Stream_Conversion
     {
         private List<string> messages = new List<string>();
         private Guid subscribtionId;
-        private string FromUnit;
+        private UserUnit FromUnit;
 
         private string topic;
         private string toUnit;
@@ -31,13 +31,19 @@ namespace Bsc_In_Stream_Conversion
             this.topic = topic;
             this.toUnit = toUnit;
             this.answerCallback = answerCallback;
-            FromUnit = topic.Split("/").Last();
+            FromUnit = UserUnit.Parse(topic.Split("/").Last().Replace("%F2", "/"));
             subscribtionId = await mqttClientManager.Subscribe(topic, HandleNewMessage);
         }
 
         private async Task HandleNewMessage(string message)
         {
-            var convertedValue = await unitConverter.Convert(FromUnit, toUnit, decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture));
+            var userUnit = UserUnit.Parse(toUnit);
+            var value = decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+
+            var numeratorValue = await unitConverter.Convert(FromUnit.Numerator, userUnit.Numerator, value);
+            var denominatorValue = await unitConverter.Convert(FromUnit.Denominator, userUnit.Denominator, 1);
+
+            var convertedValue = numeratorValue / denominatorValue;
 
             await answerCallback("NewData", new object[]{ convertedValue.ToString() }, CancellationToken.None);
         }

@@ -5,25 +5,24 @@ using System.Threading.Tasks;
 
 namespace Bsc_In_Stream_Conversion
 {
-    public class UnitParser
+    public class UserUnit
     {
 
         //MEGAM/(KG*DEG_C)^    FT^2/LightYear^3 = FT*FT/HR*HR*HR = FT->M 0.308*0.308/3600*3600*3600  U -> SI-Unit -> XU
-        private List<string> Numerator = new List<string>();
-        private List<string> Denominator = new List<string>();
+        public List<string> Numerator { get; private set; } = new List<string>();
+        public List<string> Denominator { get; private set; } = new List<string>();
 
-        private decimal SI_UnitFactor = 0.0m;
 
-        private List<string> SI_Numerator = new List<string>();
-        private List<string> SI_Denominator = new List<string>();
-
-        public static UnitParser Parse(string input)
+        public static UserUnit Parse(string input)
         {
-            var up = new UnitParser();
+            var up = new UserUnit();
             input = input.Replace(" ", "").Replace("\t", "").ToUpperInvariant();
 
             ParseFractionPart(input.Split("/")[0], up.Numerator);
-            ParseFractionPart(input.Split("/")[1], up.Denominator);
+            if (input.Contains("/"))
+            {
+                ParseFractionPart(input.Split("/")[1], up.Denominator);
+            }
             return up;
         }
 
