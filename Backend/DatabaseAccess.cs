@@ -1,4 +1,5 @@
 ﻿using Npgsql;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -117,6 +118,7 @@ namespace Bsc_In_Stream_Conversion
                     }
                 }catch(DbException e)
                 {
+                    Log.Error(e.Message + e.StackTrace);
                     Console.Error.WriteLine("Errro Message: " + e.Message);
                     Console.Error.WriteLine(e.StackTrace);
                     Console.Error.Flush();
@@ -250,6 +252,7 @@ namespace Bsc_In_Stream_Conversion
                     }
                     catch (DbException e)
                     {
+                        Log.Error(e.Message + e.StackTrace);
                         Console.Error.WriteLine("Errro Message: " + e.Message);
                         Console.Error.WriteLine(e.StackTrace);
                         Console.Error.Flush();
@@ -270,6 +273,7 @@ namespace Bsc_In_Stream_Conversion
                     }
                     catch (DbException e)
                     {
+                        Log.Error(e.Message + e.StackTrace);
                         Console.Error.WriteLine("Errro Message: " + e.Message);
                         Console.Error.WriteLine(e.StackTrace);
                         Console.Error.Flush();
@@ -279,7 +283,7 @@ namespace Bsc_In_Stream_Conversion
             }
             catch (DbException e)
             {
-
+                Log.Error(e.Message + e.StackTrace);
                 Console.Error.WriteLine(e.Message + Environment.NewLine + e.StackTrace);
             }
             throw new Exception("Something Unexpected happened");
