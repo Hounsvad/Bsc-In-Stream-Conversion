@@ -49,6 +49,7 @@ namespace Bsc_In_Stream_Conversion
                 Unit toDatabaseUnit = await db.SelectUnit(toUnits[i]);
                 compoundValue = (((compoundValue * fromDatabaseUnit.ConversionMultiplier) + fromDatabaseUnit.ConversionOffset) - toDatabaseUnit.ConversionOffset) / toDatabaseUnit.ConversionMultiplier;
             }
+
             return compoundValue;
         }
 

@@ -38,7 +38,14 @@ namespace Bsc_In_Stream_Conversion.Controllers
                 var numeratorValue = await unitConverter.Convert(FromUnit.Numerator, ToUnit.Numerator, Value);
                 var denominatorValue = await unitConverter.Convert(FromUnit.Denominator, ToUnit.Denominator, 1);
 
-                var convertedValue = numeratorValue / denominatorValue;
+                var fromUnitPrefixfactor = (decimal)Math.Pow(FromUnit.NumeratorPrefixes.Base, FromUnit.NumeratorPrefixes.Factor) / 
+                                            (decimal)Math.Pow(FromUnit.DenominatorPrefixes.Base, FromUnit.DenominatorPrefixes.Factor); 
+
+                var toUnitPrefixfactor = (decimal)Math.Pow(ToUnit.DenominatorPrefixes.Base, ToUnit.DenominatorPrefixes.Factor) / 
+                                        (decimal)Math.Pow(ToUnit.NumeratorPrefixes.Base, ToUnit.NumeratorPrefixes.Factor);
+
+
+                var convertedValue = fromUnitPrefixfactor * toUnitPrefixfactor * (numeratorValue / denominatorValue);
 
                 return Ok(convertedValue);
             }catch(InvalidOperationException InvEx)

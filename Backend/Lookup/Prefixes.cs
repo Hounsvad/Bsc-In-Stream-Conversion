@@ -7,15 +7,24 @@ namespace Bsc_In_Stream_Conversion.Lookup
 {
     public class Prefixes
     {
-        public struct ConversionFactor
+        public class ConversionFactor
         {
-            int Base;
-            int Factor;
+            public int Base;
+            public double Factor;
 
-            public ConversionFactor(int @base, int factor)
+            public ConversionFactor(int @base, double factor)
             {
                 Base = @base;
                 Factor = factor;
+            }
+
+            public static ConversionFactor operator *(ConversionFactor cf1, ConversionFactor cf2)
+            {
+                if (cf1.Base != cf2.Base)
+                {
+                    throw new InvalidOperationException("Cannot add convertion factors of different bases");
+                }
+                return new ConversionFactor(cf1.Base, cf1.Factor + cf2.Factor);
             }
         }
 
@@ -41,14 +50,14 @@ namespace Bsc_In_Stream_Conversion.Lookup
             {"ATTO", new ConversionFactor(10, -18) },
             {"ZEPTO", new ConversionFactor(10, -21) },
             {"YOCTO", new ConversionFactor(10, -24) },
-            {"KIBI", new ConversionFactor(2, 10) },
-            {"MIBI", new ConversionFactor(2, 20) },
-            {"GIBI", new ConversionFactor(2, 30) },
-            {"TEBI", new ConversionFactor(2, 40) },
-            {"PEBI", new ConversionFactor(2, 50) },
-            {"EXBI", new ConversionFactor(2, 60) },
-            {"ZEBI", new ConversionFactor(2, 70) },
-            {"YOBI", new ConversionFactor(2, 80) }
+            {"KIBI", new ConversionFactor(10, 3.01029995664) },
+            {"MIBI", new ConversionFactor(10, 6.02059991328) },
+            {"GIBI", new ConversionFactor(10, 9.03089986992) },
+            {"TEBI", new ConversionFactor(10, 12.0411998266) },
+            {"PEBI", new ConversionFactor(10, 15.0514997832) },
+            {"EXBI", new ConversionFactor(10, 18.0617997398) },
+            {"ZEBI", new ConversionFactor(10, 21.0720996965) },
+            {"YOBI", new ConversionFactor(10, 24.0823996531) }
         };
     }
 }
