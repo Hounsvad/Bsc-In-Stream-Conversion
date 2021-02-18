@@ -20,13 +20,7 @@ namespace Bsc_In_Stream_Conversion
             connectionPool.WaitOne();
             var conn = new NpgsqlConnection(connString);
             await conn.OpenAsync();
-            conn.Disposed += ReleaseSemaphore;
             return conn;
-        }
-
-        private void ReleaseSemaphore(object sender, EventArgs e)
-        {
-            connectionPool.Release();
         }
 
         public async Task<int> InsertUnitsAsync(IEnumerable<Unit> units)
@@ -124,6 +118,7 @@ namespace Bsc_In_Stream_Conversion
                     Console.Error.Flush();
                 }
             }
+            connectionPool.Release();
             return false;
         }
 
@@ -166,6 +161,7 @@ namespace Bsc_In_Stream_Conversion
                     Console.Error.Flush();
                 }
             }
+            connectionPool.Release();
             return false;
         }
 
@@ -198,6 +194,7 @@ namespace Bsc_In_Stream_Conversion
                     Console.Error.Flush();
                 }
             }
+            connectionPool.Release();
             return false;
         }
 
@@ -285,6 +282,10 @@ namespace Bsc_In_Stream_Conversion
             {
                 Log.Error(e.Message + e.StackTrace);
                 Console.Error.WriteLine(e.Message + Environment.NewLine + e.StackTrace);
+            }
+            finally
+            {
+                connectionPool.Release();
             }
             throw new Exception("Something Unexpected happened");
         } 

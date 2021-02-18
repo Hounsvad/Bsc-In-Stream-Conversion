@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -37,21 +38,27 @@ namespace Bsc_In_Stream_Conversion
 
         private async Task HandleNewMessage(string message)
         {
-            var userUnit = UserUnit.Parse(toUnit);
-            var value = decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+            try
+            {
+                var userUnit = UserUnit.Parse(toUnit);
+                var value = decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
 
-            var numeratorValue = await unitConverter.Convert(FromUnit.Numerator, userUnit.Numerator, value);
-            var denominatorValue = await unitConverter.Convert(FromUnit.Denominator, userUnit.Denominator, 1);
+                var numeratorValue = await unitConverter.Convert(FromUnit.Numerator, userUnit.Numerator, value);
+                var denominatorValue = await unitConverter.Convert(FromUnit.Denominator, userUnit.Denominator, 1);
 
-            var fromUnitPrefixfactor = (decimal)Math.Pow(FromUnit.DenominatorPrefixes.Base, FromUnit.DenominatorPrefixes.Factor) /
-                                            (decimal)Math.Pow(FromUnit.NumeratorPrefixes.Base, FromUnit.NumeratorPrefixes.Factor);
+                var fromUnitPrefixfactor = (decimal)Math.Pow(FromUnit.NumeratorPrefixes.Base, FromUnit.NumeratorPrefixes.Factor) /
+                                                (decimal)Math.Pow(FromUnit.DenominatorPrefixes.Base, FromUnit.DenominatorPrefixes.Factor);
 
-            var toUnitPrefixfactor = (decimal)Math.Pow(userUnit.NumeratorPrefixes.Base, userUnit.NumeratorPrefixes.Factor) /
-                                    (decimal)Math.Pow(userUnit.DenominatorPrefixes.Base, userUnit.DenominatorPrefixes.Factor);
+                var toUnitPrefixfactor = (decimal)Math.Pow(userUnit.DenominatorPrefixes.Base, userUnit.DenominatorPrefixes.Factor) /
+                                        (decimal)Math.Pow(userUnit.NumeratorPrefixes.Base, userUnit.NumeratorPrefixes.Factor);
 
-            var convertedValue = fromUnitPrefixfactor * toUnitPrefixfactor * numeratorValue / denominatorValue;
+                var convertedValue = fromUnitPrefixfactor * toUnitPrefixfactor * numeratorValue / denominatorValue;
 
-            await answerCallback("NewData", new object[]{ convertedValue.ToString() }, CancellationToken.None);
+                await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
+            }catch(Exception e)
+            {
+                Log.Error("Error sending message " + e.StackTrace, e);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using MQTTnet;
 using MQTTnet.Client;
 using MQTTnet.Client.Options;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,7 +23,13 @@ namespace Bsc_In_Stream_Conversion
 
         public MQTTClientManager()
         {
-            SetupConenction("home.hounsvad.dk", 1883);
+            try
+            {
+                SetupConenction("home.hounsvad.dk", 1883);
+            }catch(Exception e)
+            {
+                Log.Error("MQTT setup failed: ", e);
+            }
         }
 
         private void SetupConenction(string url, int port)
@@ -49,15 +56,22 @@ namespace Bsc_In_Stream_Conversion
                 }
                 catch(Exception ex)
                 {
+                    Log.Error("Disconneted from MQTT", e);
                     reconnectAttempts++;
                 }
             });
 
             client.UseApplicationMessageReceivedHandler(e =>
             {
-                foreach(var (x, y) in TopicsCallbacks.Values.Where(x => x.Item1 == e.ApplicationMessage.Topic))
+                try
                 {
-                    y(Encoding.UTF8.GetString(e.ApplicationMessage.Payload));
+                    foreach (var (x, y) in TopicsCallbacks.Values.Where(x => x.Item1 == e.ApplicationMessage.Topic))
+                    {
+                        y(Encoding.UTF8.GetString(e.ApplicationMessage.Payload));
+                    }
+                }catch(Exception ex)
+                {
+                    Log.Error("Error sending message", ex);
                 }
             });
         }
@@ -66,7 +80,13 @@ namespace Bsc_In_Stream_Conversion
         {
             if (!client.IsConnected)
             {
-                await client.ConnectAsync(options);
+                try
+                {
+                    await client.ConnectAsync(options);
+                }catch(Exception e)
+                {
+                    Log.Error("Could not connect to MQTT: ", e);
+                }
             }
             var result = await client.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic).Build());
             var subId = Guid.NewGuid();
