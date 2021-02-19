@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,48 +15,62 @@ namespace SignalRClient
         {
             while (true)
             {
-                Console.WriteLine($"Live clients: {conns.Count}");
-                await Task.Run(async () =>
+                for (int i = 0; i < 100; i++)
                 {
-                    HubConnection conn = new HubConnectionBuilder()
-                   .WithAutomaticReconnect()
-                   .WithUrl("https://localhost:44380/SubscribeHub")
-                   .Build();
-
-                    conns.Add(conn);
-
-                    conn.On<string>("NewData", data =>
-                    {
-                        //Console.WriteLine(data);
-                    });
-
-                    try
-                    {
-                        await conn.StartAsync();
-                        //Console.WriteLine("Connection started");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                        Console.WriteLine(e.StackTrace);
-                    }
-
-                    try
-                    {
-                        await conn.InvokeAsync("SubscribeTo", "Hounsvad%2Fpi%2Fcputemp%2FDEG_C", "K");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                        Console.WriteLine(e.StackTrace);
-                    }
-                });
-                Thread.Sleep(1000);
-                if(conns.Count % 10 == 0)
-                {
-                    Thread.Sleep(10000);
+                    await CreateClient();
                 }
+                Thread.Sleep(30000);
             }
+        }
+
+        private static async Task CreateClient()
+        {
+            Console.WriteLine($"Live clients: {conns.Count}");
+            await Task.Run(async () =>
+            {
+                HubConnection conn = new HubConnectionBuilder()
+               .WithAutomaticReconnect()
+               .WithUrl("https://home.hounsvad.dk:44380/SubscribeHub", (opts) =>
+               {
+                   opts.HttpMessageHandlerFactory = (message) =>
+                   {
+                       if (message is HttpClientHandler clientHandler)
+                               // bypass SSL certificate
+                               clientHandler.ServerCertificateCustomValidationCallback +=
+                               (sender, certificate, chain, sslPolicyErrors) => { return true; };
+                       return message;
+                   };
+               })
+               .Build();
+
+                conns.Add(conn);
+
+                conn.On<string>("NewData", data =>
+                {
+                    //Console.WriteLine(data);
+                });
+
+                try
+                {
+                    await conn.StartAsync();
+                    //Console.WriteLine("Connection started");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
+
+                try
+                {
+                    await conn.InvokeAsync("SubscribeTo", "Hounsvad%2Fpi%2Fcputemp%2FDEG_C", "K");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
+            });
         }
     }
 }
