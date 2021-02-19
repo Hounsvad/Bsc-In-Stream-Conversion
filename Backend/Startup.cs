@@ -41,6 +41,7 @@ namespace Bsc_In_Stream_Conversion
             services.AddTransient<IUnitConverter, UnitConverter>();
             services.AddSingleton<IMQTTClientManager, MQTTClientManager>();
             services.AddSingleton<DatabaseAccess>();
+            services.AddSingleton<UnitFactory>();
             
             services.AddScoped<SocketRequestHandler>();
             Log.Logger = new LoggerConfiguration()

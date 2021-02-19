@@ -9,6 +9,8 @@ namespace Bsc_In_Stream_Conversion.Lookup
     {
         public class ConversionFactor
         {
+            public static ConversionFactor One = new ConversionFactor(10, 0);
+
             public int Base;
             public double Factor;
 

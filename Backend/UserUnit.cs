@@ -14,108 +14,66 @@ namespace Bsc_In_Stream_Conversion
         public List<string> Numerator { get; private set; } = new List<string>();
         public List<string> Denominator { get; private set; } = new List<string>();
 
-        public ConversionFactor NumeratorPrefixes { get; private set; } = new ConversionFactor(10, 0);
-        public ConversionFactor DenominatorPrefixes { get; private set; } = new ConversionFactor(10, 0);
+        public ConversionFactor NumeratorPrefix { get; private set; } = new ConversionFactor(10, 0);
+        public ConversionFactor DenominatorPrefix { get; private set; } = new ConversionFactor(10, 0);
 
-        public static UserUnit Parse(string input)
+        public decimal PrefixFactor { get
+            {
+                return (decimal)Math.Pow(NumeratorPrefix.Base, NumeratorPrefix.Factor) / (decimal)Math.Pow(DenominatorPrefix.Base, DenominatorPrefix.Factor);
+            } 
+        }
+
+        public decimal Multiplier = 1;
+        public decimal OffSet = 0;
+
+        public UserUnit()
+        {
+        }
+
+        public UserUnit(ConversionFactor numeratorPrefixes, ConversionFactor denominatorPrefixes, decimal multiplier, decimal offSet)
+        {
+            NumeratorPrefix = numeratorPrefixes;
+            DenominatorPrefix = denominatorPrefixes;
+            Multiplier = multiplier;
+            OffSet = offSet;
+        }
+
+        public decimal ConvertToBaseValue(decimal value)
+        {
+            return (value * Multiplier + OffSet) * PrefixFactor;
+        }
+
+        public decimal ConvertFromBaseValue(decimal value)
+        {
+            return (value - OffSet) / Multiplier / PrefixFactor;
+        }
+
+        public static UserUnit operator *(UserUnit uu1, UserUnit uu2)
         {
             var uu = new UserUnit();
-            input = input.Replace(" ", "").Replace("\t", "").ToUpperInvariant();
-
-            ParseFractionPart(input.Split("/")[0], uu, true);
-            if (input.Contains("/"))
-            {
-                ParseFractionPart(input.Split("/")[1], uu, false);
-            }
+            uu.Numerator.AddRange(uu1.Numerator);
+            uu.Numerator.AddRange(uu2.Numerator);
+            uu.Denominator.AddRange(uu1.Denominator);
+            uu.Denominator.AddRange(uu2.Denominator);
+            uu.Multiplier = uu1.Multiplier * uu2.Multiplier;
+            uu.OffSet = uu1.OffSet * uu2.Multiplier + uu2.OffSet;
+            uu.NumeratorPrefix = uu1.NumeratorPrefix * uu2.NumeratorPrefix;
+            uu.DenominatorPrefix = uu1.DenominatorPrefix * uu2.DenominatorPrefix;
             return uu;
         }
 
-        private static void ParseFractionPart(string input, UserUnit uu, bool isNumerator)
+        public static UserUnit operator /(UserUnit uu1, UserUnit uu2)
         {
-            var parts = input.Split("*");
-            foreach (var part in parts)
-            {
-                bool hasPrefix;
-                (string, ConversionFactor)? prefixFactor;
-                FindPrefix(part, out hasPrefix, out prefixFactor);
-
-                if (part.Contains("^"))
-                {
-                    SeperatePowers(uu, part, hasPrefix, prefixFactor, isNumerator);
-                }
-                else
-                {
-                    string partToAdd = part;
-                    if (hasPrefix)
-                    {
-                        if (isNumerator)
-                        {
-                            uu.NumeratorPrefixes *= (ConversionFactor)prefixFactor?.Item2;
-                        }
-                        else
-                        {
-                            uu.DenominatorPrefixes *= (ConversionFactor)prefixFactor?.Item2;
-                        }
-                        partToAdd = part.Replace(prefixFactor?.Item1, "");
-                    }
-                    if (isNumerator)
-                    {
-                        uu.Numerator.Add(partToAdd);
-                    }
-                    else
-                    {
-                        uu.Denominator.Add(partToAdd);
-                    }
-                    
-                }
-            }
+            var uu = new UserUnit();
+            uu.Numerator.AddRange(uu1.Numerator);
+            uu.Numerator.AddRange(uu2.Denominator);
+            uu.Denominator.AddRange(uu1.Denominator);
+            uu.Denominator.AddRange(uu2.Numerator);
+            uu.Multiplier = uu1.Multiplier / (uu2.Multiplier + uu2.OffSet);
+            uu.OffSet = uu1.OffSet / (uu2.Multiplier + uu2.OffSet);
+            uu.NumeratorPrefix = uu1.NumeratorPrefix * uu2.DenominatorPrefix;
+            uu.DenominatorPrefix = uu1.DenominatorPrefix * uu2.NumeratorPrefix;
+            return uu;
         }
-
-        private static void SeperatePowers(UserUnit uu, string part, bool hasPrefix, (string, ConversionFactor)? prefixFactor, bool isNumerator)
-        {
-            var splitPart = part.Split("^");
-            var amount = int.Parse(splitPart[1]);
-            if (hasPrefix)
-            {
-                splitPart[0] = splitPart[0].Replace(prefixFactor?.Item1, "");
-            }
-            for (int i = 0; i < amount; i++)
-            {
-                if (hasPrefix)
-                {
-                    if (isNumerator)
-                    {
-                        uu.NumeratorPrefixes *= (ConversionFactor)prefixFactor?.Item2;
-                    }
-                    else
-                    {
-                        uu.DenominatorPrefixes *= (ConversionFactor)prefixFactor?.Item2;
-                    }
-                }
-                if (isNumerator)
-                {
-                    uu.Numerator.Add(part.Replace(prefixFactor?.Item1, ""));
-                }
-                else
-                {
-                    uu.Denominator.Add(part.Replace(prefixFactor?.Item1, ""));
-                }
-            }
-        }
-
-        private static void FindPrefix(string part, out bool hasPrefix, out (string, ConversionFactor)? prefixFactor)
-        {
-            hasPrefix = false;
-            prefixFactor = null;
-            foreach (var prefix in Prefixes.IntegerFactor.Keys)
-            {
-                if (part.StartsWith(prefix))
-                {
-                    hasPrefix = true;
-                    prefixFactor = (prefix, Prefixes.IntegerFactor[prefix]);
-                }
-            }
-        }
-
     }
 }

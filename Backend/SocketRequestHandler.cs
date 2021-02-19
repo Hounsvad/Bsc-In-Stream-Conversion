@@ -21,11 +21,13 @@ namespace Bsc_In_Stream_Conversion
         private IMQTTClientManager mqttClientManager;
         private Func<string, object[], CancellationToken, Task> answerCallback;
         private IUnitConverter unitConverter;
+        private readonly UnitFactory unitFactory;
 
-        public SocketRequestHandler(IMQTTClientManager mqttClientManager, IUnitConverter unitConverter)
+        public SocketRequestHandler(IMQTTClientManager mqttClientManager, IUnitConverter unitConverter, UnitFactory unitFactory)
         {
             this.mqttClientManager = mqttClientManager;
             this.unitConverter = unitConverter;
+            this.unitFactory = unitFactory;
         }
 
         public async Task Subscribe(string topic, string toUnit, Func<string, object[], CancellationToken, Task> answerCallback)
@@ -33,7 +35,7 @@ namespace Bsc_In_Stream_Conversion
             this.topic = topic;
             this.toUnit = toUnit;
             this.answerCallback = answerCallback;
-            FromUnit = UserUnit.Parse(topic.Split("/").Last().Replace("%F2", "/"));
+            FromUnit = await unitFactory.Parse(topic.Split("/").Last().Replace("%F2", "/"));
             subscribtionId = await mqttClientManager.Subscribe(topic, HandleNewMessage);
         }
 
@@ -43,19 +45,10 @@ namespace Bsc_In_Stream_Conversion
             {
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
-                var userUnit = UserUnit.Parse(toUnit);
+                var userUnit = await unitFactory.Parse(toUnit);
                 var value = decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
 
-                var numeratorValue = await unitConverter.Convert(FromUnit.Numerator, userUnit.Numerator, value);
-                var denominatorValue = await unitConverter.Convert(FromUnit.Denominator, userUnit.Denominator, 1);
-
-                var fromUnitPrefixfactor = (decimal)Math.Pow(FromUnit.NumeratorPrefixes.Base, FromUnit.NumeratorPrefixes.Factor) /
-                                                (decimal)Math.Pow(FromUnit.DenominatorPrefixes.Base, FromUnit.DenominatorPrefixes.Factor);
-
-                var toUnitPrefixfactor = (decimal)Math.Pow(userUnit.DenominatorPrefixes.Base, userUnit.DenominatorPrefixes.Factor) /
-                                        (decimal)Math.Pow(userUnit.NumeratorPrefixes.Base, userUnit.NumeratorPrefixes.Factor);
-
-                var convertedValue = fromUnitPrefixfactor * toUnitPrefixfactor * numeratorValue / denominatorValue;
+                var convertedValue = userUnit.ConvertFromBaseValue(FromUnit.ConvertToBaseValue(value));
 
                 await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
                 timer.Stop();

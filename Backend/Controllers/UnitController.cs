@@ -13,10 +13,12 @@ namespace Bsc_In_Stream_Conversion.Controllers
     public class UnitController : ControllerBase
     {
         private readonly IUnitConverter unitConverter;
+        private readonly UnitFactory unitFactory;
 
-        public UnitController(IUnitConverter unitConverter)
+        public UnitController(IUnitConverter unitConverter, UnitFactory unitFactory)
         {
             this.unitConverter = unitConverter;
+            this.unitFactory = unitFactory;
         }
 
         [HttpGet("{FromSystemName}/{ToSystemName}/{Value}")]
@@ -32,20 +34,10 @@ namespace Bsc_In_Stream_Conversion.Controllers
                 FromSystemName = FromSystemName.Replace("47", "/");
                 ToSystemName = ToSystemName.Replace("47", "/");
 
-                var FromUnit = UserUnit.Parse(FromSystemName);
-                var ToUnit = UserUnit.Parse(ToSystemName);
+                var FromUnit = await unitFactory.Parse(FromSystemName);
+                var ToUnit = await unitFactory.Parse(ToSystemName);
 
-                var numeratorValue = await unitConverter.Convert(FromUnit.Numerator, ToUnit.Numerator, Value);
-                var denominatorValue = await unitConverter.Convert(FromUnit.Denominator, ToUnit.Denominator, 1);
-
-                var fromUnitPrefixfactor = (decimal)Math.Pow(FromUnit.NumeratorPrefixes.Base, FromUnit.NumeratorPrefixes.Factor) / 
-                                            (decimal)Math.Pow(FromUnit.DenominatorPrefixes.Base, FromUnit.DenominatorPrefixes.Factor); 
-
-                var toUnitPrefixfactor = (decimal)Math.Pow(ToUnit.DenominatorPrefixes.Base, ToUnit.DenominatorPrefixes.Factor) / 
-                                        (decimal)Math.Pow(ToUnit.NumeratorPrefixes.Base, ToUnit.NumeratorPrefixes.Factor);
-
-
-                var convertedValue = fromUnitPrefixfactor * toUnitPrefixfactor * (numeratorValue / denominatorValue);
+                var convertedValue = ToUnit.ConvertFromBaseValue(FromUnit.ConvertToBaseValue(Value));
 
                 return Ok(convertedValue);
             }catch(InvalidOperationException InvEx)
