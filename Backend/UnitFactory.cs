@@ -51,7 +51,8 @@ namespace Bsc_In_Stream_Conversion
                     }
                     var dbUnit = await db.SelectUnit(partToAdd);
 
-                    UserUnit newUU = new UserUnit(numeratorPrefixes:    hasPrefix ? (prefixFactor?.Item2) : ConversionFactor.One,
+                    UserUnit newUU = new UserUnit(name: partToAdd,
+                                                  numeratorPrefixes:    hasPrefix ? (prefixFactor?.Item2) : ConversionFactor.One,
                                                   denominatorPrefixes:  ConversionFactor.One,
                                                   multiplier:           dbUnit.ConversionMultiplier,
                                                   offSet:               dbUnit.ConversionOffset);
@@ -87,7 +88,8 @@ namespace Bsc_In_Stream_Conversion
                 }
                 var dbUnit = await db.SelectUnit(partToAdd);
 
-                UserUnit newUU = new UserUnit(numeratorPrefixes: hasPrefix ? (prefixFactor?.Item2) : ConversionFactor.One,
+                UserUnit newUU = new UserUnit(name: partToAdd, 
+                                              numeratorPrefixes: hasPrefix ? (prefixFactor?.Item2) : ConversionFactor.One,
                                               denominatorPrefixes: ConversionFactor.One,
                                               multiplier: dbUnit.ConversionMultiplier,
                                               offSet: dbUnit.ConversionOffset);
@@ -111,7 +113,7 @@ namespace Bsc_In_Stream_Conversion
             prefixFactor = null;
             foreach (var prefix in Prefixes.IntegerFactor.Keys)
             {
-                if (part.StartsWith(prefix))
+                if (part.StartsWith(prefix) && !String.IsNullOrWhiteSpace(prefix))
                 {
                     hasPrefix = true;
                     prefixFactor = (prefix, Prefixes.IntegerFactor[prefix]);

@@ -28,6 +28,34 @@ namespace Bsc_In_Stream_Conversion.Lookup
                 }
                 return new ConversionFactor(cf1.Base, cf1.Factor + cf2.Factor);
             }
+
+            public static bool operator ==(ConversionFactor cf1, ConversionFactor cf2)
+            {
+                return cf1.Base == cf2.Base && cf1.Factor == cf2.Factor;
+            }
+
+            public static bool operator !=(ConversionFactor cf1, ConversionFactor cf2)
+            {
+                return cf1.Base != cf2.Base || cf1.Factor != cf2.Factor;
+            }
+            
+            public override bool Equals(Object cf1)
+            {
+                if (cf1 is ConversionFactor)
+                {
+                    var x = (ConversionFactor)cf1;
+                    return x.Base == Base && x.Factor == Factor;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(Base, Factor);
+            }
         }
 
         public static Dictionary<string, ConversionFactor> IntegerFactor = new Dictionary<string, ConversionFactor>()
@@ -42,6 +70,7 @@ namespace Bsc_In_Stream_Conversion.Lookup
             {"KILO", new ConversionFactor(10, 3) },
             {"HECTO", new ConversionFactor(10, 2) },
             {"DECA", new ConversionFactor(10, 1) },
+            {"", new ConversionFactor(10,1) },
             {"DECI", new ConversionFactor(10, -1) },
             {"CENTI", new ConversionFactor(10, -2) },
             {"MILLI", new ConversionFactor(10, -3) },
