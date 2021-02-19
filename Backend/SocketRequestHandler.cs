@@ -17,7 +17,7 @@ namespace Bsc_In_Stream_Conversion
         private UserUnit FromUnit;
 
         private string topic;
-        private string toUnit;
+        private UserUnit toUnit;
         private IMQTTClientManager mqttClientManager;
         private Func<string, object[], CancellationToken, Task> answerCallback;
         private IUnitConverter unitConverter;
@@ -33,7 +33,7 @@ namespace Bsc_In_Stream_Conversion
         public async Task Subscribe(string topic, string toUnit, Func<string, object[], CancellationToken, Task> answerCallback)
         {
             this.topic = topic;
-            this.toUnit = toUnit;
+            this.toUnit = await unitFactory.Parse(toUnit);
             this.answerCallback = answerCallback;
             FromUnit = await unitFactory.Parse(topic.Split("/").Last().Replace("%F2", "/"));
             subscribtionId = await mqttClientManager.Subscribe(topic, HandleNewMessage);
@@ -45,10 +45,9 @@ namespace Bsc_In_Stream_Conversion
             {
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
-                var userUnit = await unitFactory.Parse(toUnit);
                 var value = decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
 
-                var convertedValue = userUnit.ConvertFromBaseValue(FromUnit.ConvertToBaseValue(value));
+                var convertedValue = toUnit.ConvertFromBaseValue(FromUnit.ConvertToBaseValue(value));
 
                 await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
                 timer.Stop();
