@@ -1,46 +1,61 @@
 ﻿
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SignalRClient
 {
     class Program
     {
-        private static HubConnection conn;
+        private static List<HubConnection> conns = new List<HubConnection>();
         static async Task Main(string[] args)
         {
-            conn = new HubConnectionBuilder()
-                .WithAutomaticReconnect()
-                .WithUrl("https://localhost:44380/SubscribeHub")
-                .Build();
+            while (true)
+            {
+                Console.WriteLine($"Live clients: {conns.Count}");
+                await Task.Run(async () =>
+                {
+                    HubConnection conn = new HubConnectionBuilder()
+                   .WithAutomaticReconnect()
+                   .WithUrl("https://localhost:44380/SubscribeHub")
+                   .Build();
 
-            conn.On<string>("NewData", data =>
-            {
-                Console.WriteLine(data);
-            });
+                    conns.Add(conn);
 
-            try
-            {
-                await conn.StartAsync();
-                Console.WriteLine("Connection started");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
-            }
+                    conn.On<string>("NewData", data =>
+                    {
+                        //Console.WriteLine(data);
+                    });
 
-            try
-            {
-                await conn.InvokeAsync("SubscribeTo", "Hounsvad%2Fpi%2Fcputemp%2FDEG_C", "K");
+                    try
+                    {
+                        await conn.StartAsync();
+                        //Console.WriteLine("Connection started");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        Console.WriteLine(e.StackTrace);
+                    }
+
+                    try
+                    {
+                        await conn.InvokeAsync("SubscribeTo", "Hounsvad%2Fpi%2Fcputemp%2FDEG_C", "K");
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                        Console.WriteLine(e.StackTrace);
+                    }
+                });
+                Thread.Sleep(1000);
+                if(conns.Count % 10 == 0)
+                {
+                    Thread.Sleep(10000);
+                }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
-            }
-            while (true) ;
         }
     }
 }

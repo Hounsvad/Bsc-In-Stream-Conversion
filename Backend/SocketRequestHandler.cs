@@ -1,6 +1,8 @@
 ﻿using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Net.WebSockets;
@@ -21,6 +23,8 @@ namespace Bsc_In_Stream_Conversion
         private Func<string, object[], CancellationToken, Task> answerCallback;
         private IUnitConverter unitConverter;
 
+        private static ConcurrentQueue<(int, long)> ResponseTimeByLiveClients = new ConcurrentQueue<(int, long)>();
+
         public SocketRequestHandler(IMQTTClientManager mqttClientManager, IUnitConverter unitConverter)
         {
             this.mqttClientManager = mqttClientManager;
@@ -40,6 +44,8 @@ namespace Bsc_In_Stream_Conversion
         {
             try
             {
+                Stopwatch timer = new Stopwatch();
+                timer.Start();
                 var userUnit = UserUnit.Parse(toUnit);
                 var value = decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
 
@@ -55,6 +61,8 @@ namespace Bsc_In_Stream_Conversion
                 var convertedValue = fromUnitPrefixfactor * toUnitPrefixfactor * numeratorValue / denominatorValue;
 
                 await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
+                timer.Stop();
+                ResponseTimeByLiveClients.Enqueue((mqttClientManager.GetActiveClientsCount(), timer.ElapsedMilliseconds));
             }catch(Exception e)
             {
                 Log.Error("Error sending message " + e.StackTrace, e);

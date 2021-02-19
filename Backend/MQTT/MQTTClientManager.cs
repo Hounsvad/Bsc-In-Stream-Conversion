@@ -115,5 +115,10 @@ namespace Bsc_In_Stream_Conversion
 
             await client.PublishAsync(mqttMessage, CancellationToken.None);
         }
+
+        public int GetActiveClientsCount()
+        {
+            return TopicsCallbacks.Count();
+        }
     }
 }

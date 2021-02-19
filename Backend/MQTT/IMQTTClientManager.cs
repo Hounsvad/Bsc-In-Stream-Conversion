@@ -13,5 +13,6 @@ namespace Bsc_In_Stream_Conversion
 
         Task PublishMessageAsync(string topic, string message);
 
+        int GetActiveClientsCount();
     }
 }

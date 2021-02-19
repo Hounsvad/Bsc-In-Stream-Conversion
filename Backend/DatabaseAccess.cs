@@ -11,7 +11,7 @@ namespace Bsc_In_Stream_Conversion
 {
     public class DatabaseAccess
     {
-        readonly String connString = "Host=hattie.db.elephantsql.com;Username=ipnajzyj;Password=ESeXjzWr6q1onkepNgbFiLzh8EQEm8pF;Database=ipnajzyj";
+        readonly String connString = "Host=home.hounsvad.dk;Username=ipnajzyj;Password=ESeXjzWr6q1onkepNgbFiLzh8EQEm8pF;Database=ipnajzyj";
 
         private Semaphore connectionPool = new Semaphore(5, 5);
         
