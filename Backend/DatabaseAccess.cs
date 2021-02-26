@@ -301,6 +301,7 @@ namespace Bsc_In_Stream_Conversion
             {
                 using var connection = await getConnection();
                 List<Unit> unitList = new List<Unit>();
+                //TODO: Better query: select * from "Units" join "DimensionVectors" DV on "Units"."SystemName" = DV."SystemName" join "QuantityKind" QK on "Units"."SystemName" = QK."SystemName" where "Units"."UnitName" ilike
                 await using (var cmd = new NpgsqlCommand("SELECT * FROM \"Units\" WHERE \"UnitName\" ilike @UnitName ", connection))
                 {
                     cmd.Parameters.AddWithValue("UnitName", NpgsqlTypes.NpgsqlDbType.Varchar, UnitName);
