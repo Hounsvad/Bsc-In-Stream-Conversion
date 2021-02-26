@@ -39,7 +39,7 @@ namespace Bsc_In_Stream_Conversion
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bsc_In_Stream_Conversion", Version = "v1" });
             });
             services.AddTransient<IUnitConverter, UnitConverter>();
-            services.AddSingleton<IMQTTClientManager, MQTTClientManager>();
+            services.AddSingleton<IStreamClientManager, MQTTClientManager>();
             services.AddSingleton<DatabaseAccess>();
             services.AddSingleton<UnitFactory>();
             

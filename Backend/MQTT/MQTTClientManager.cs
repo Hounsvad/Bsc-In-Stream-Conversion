@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Bsc_In_Stream_Conversion
 {
-    public class MQTTClientManager : IMQTTClientManager
+    public class MQTTClientManager : IStreamClientManager
     {
         private IMqttClient client;
         private IMqttClientOptions options;

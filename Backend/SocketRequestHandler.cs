@@ -18,12 +18,12 @@ namespace Bsc_In_Stream_Conversion
 
         private string topic;
         private UserUnit toUnit;
-        private IMQTTClientManager mqttClientManager;
+        private IStreamClientManager mqttClientManager;
         private Func<string, object[], CancellationToken, Task> answerCallback;
         private IUnitConverter unitConverter;
         private readonly UnitFactory unitFactory;
 
-        public SocketRequestHandler(IMQTTClientManager mqttClientManager, IUnitConverter unitConverter, UnitFactory unitFactory)
+        public SocketRequestHandler(IStreamClientManager mqttClientManager, IUnitConverter unitConverter, UnitFactory unitFactory)
         {
             this.mqttClientManager = mqttClientManager;
             this.unitConverter = unitConverter;
@@ -37,6 +37,11 @@ namespace Bsc_In_Stream_Conversion
             this.answerCallback = answerCallback;
             FromUnit = await unitFactory.Parse(topic.Split("/").Last().Replace("%F2", "/"));
             subscribtionId = await mqttClientManager.Subscribe(topic, HandleNewMessage);
+        }
+
+        internal void Unsubscribe()
+        {
+            mqttClientManager.Unsubscribe(subscribtionId);
         }
 
         private async Task HandleNewMessage(string message)

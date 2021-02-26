@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Bsc_In_Stream_Conversion
 {
-    public interface IMQTTClientManager
+    public interface IStreamClientManager
     {
         Task<Guid> Subscribe(string topic, Func<string, Task> messageCallback);
 

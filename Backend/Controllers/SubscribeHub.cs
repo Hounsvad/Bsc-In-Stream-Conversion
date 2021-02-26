@@ -10,11 +10,11 @@ namespace Bsc_In_Stream_Conversion.Controllers
 {
     public class SubscribeHub : Hub
     {
-        private IMQTTClientManager mqttClientManager;
+        private IStreamClientManager mqttClientManager;
         private SocketRequestHandler socketRequestHandler;
         
 
-        public SubscribeHub(IMQTTClientManager mqttClientManager, SocketRequestHandler socketRequestHandler)
+        public SubscribeHub(IStreamClientManager mqttClientManager, SocketRequestHandler socketRequestHandler)
         {
             this.mqttClientManager = mqttClientManager;
             this.socketRequestHandler = socketRequestHandler;
@@ -31,6 +31,12 @@ namespace Bsc_In_Stream_Conversion.Controllers
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
             }
+        }
+
+        public override Task OnDisconnectedAsync(Exception exception)
+        {
+            socketRequestHandler.Unsubscribe();
+            return base.OnDisconnectedAsync(exception);
         }
     }
 }
