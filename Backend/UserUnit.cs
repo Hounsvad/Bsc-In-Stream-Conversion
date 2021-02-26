@@ -32,17 +32,20 @@ namespace Bsc_In_Stream_Conversion
         public decimal Multiplier = 1;
         public decimal OffSet = 0;
 
+        public DimensionVector DimensionVector = new DimensionVector();
+
         public UserUnit()
         {
         }
 
-        public UserUnit(string name, ConversionFactor numeratorPrefixes, ConversionFactor denominatorPrefixes, decimal multiplier, decimal offSet)
+        public UserUnit(string name, ConversionFactor numeratorPrefixes, ConversionFactor denominatorPrefixes, decimal multiplier, decimal offSet, DimensionVector dv)
         {
             NumeratorName = name;
             NumeratorPrefix = numeratorPrefixes;
             DenominatorPrefix = denominatorPrefixes;
             Multiplier = multiplier;
             OffSet = offSet;
+            DimensionVector = dv;
         }
 
         public decimal ConvertToBaseValue(decimal value)
@@ -82,6 +85,7 @@ namespace Bsc_In_Stream_Conversion
             uu.OffSet = uu1.OffSet * uu2.Multiplier + uu2.OffSet;
             uu.NumeratorPrefix = uu1.NumeratorPrefix * uu2.NumeratorPrefix;
             uu.DenominatorPrefix = uu1.DenominatorPrefix * uu2.DenominatorPrefix;
+            uu.DimensionVector = uu1.DimensionVector + uu2.DimensionVector;
             return uu;
         }
 
@@ -112,6 +116,7 @@ namespace Bsc_In_Stream_Conversion
             uu.OffSet = uu1.OffSet / (uu2.Multiplier + uu2.OffSet);
             uu.NumeratorPrefix = uu1.NumeratorPrefix * uu2.DenominatorPrefix;
             uu.DenominatorPrefix = uu1.DenominatorPrefix * uu2.NumeratorPrefix;
+            uu.DimensionVector = uu1.DimensionVector - uu2.DimensionVector;
             return uu;
         }
     }

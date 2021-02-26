@@ -39,6 +39,8 @@ namespace Bsc_In_Stream_Conversion.Controllers
                 var FromUnit = await unitFactory.Parse(FromSystemName);
                 var ToUnit = await unitFactory.Parse(ToSystemName);
 
+                if (FromUnit.DimensionVector != ToUnit.DimensionVector) throw new InvalidOperationException("Units do not have the same dimension vector");
+
                 var convertedValue = ToUnit.ConvertFromBaseValue(FromUnit.ConvertToBaseValue(Value));
 
                 return Ok(convertedValue);

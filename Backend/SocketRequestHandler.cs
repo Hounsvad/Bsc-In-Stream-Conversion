@@ -36,6 +36,7 @@ namespace Bsc_In_Stream_Conversion
             this.toUnit = await unitFactory.Parse(toUnit);
             this.answerCallback = answerCallback;
             FromUnit = await unitFactory.Parse(topic.Split("/").Last().Replace("%F2", "/"));
+            if (this.toUnit.DimensionVector != FromUnit.DimensionVector) throw new InvalidOperationException("Units do not have the same dimension vector");
             subscribtionId = await mqttClientManager.Subscribe(topic, HandleNewMessage);
         }
 
