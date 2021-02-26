@@ -56,7 +56,7 @@ namespace Bsc_In_Stream_Conversion
 
                 await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
                 timer.Stop();
-                Log.Information($"{timer.ElapsedMilliseconds}");
+                Log.Information($"Elapsed ticks: {timer.ElapsedTicks} frequency: {Stopwatch.Frequency}");
             }catch(Exception e)
             {
                 Log.Error("Error sending message " + e.StackTrace, e);
