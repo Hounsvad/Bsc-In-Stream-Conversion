@@ -3,6 +3,7 @@ using MQTTnet.Client;
 using MQTTnet.Client.Options;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +20,7 @@ namespace Bsc_In_Stream_Conversion
         private int reconnectAttempts = 0;
 
         //This is not the most CPU efficient way to store this
-        private Dictionary<Guid, (string, Func<string, Task>)> TopicsCallbacks = new Dictionary<Guid, (string, Func<string, Task>)>();
+        private ConcurrentDictionary<Guid, (string, Func<string, Task>)> TopicsCallbacks = new ConcurrentDictionary<Guid, (string, Func<string, Task>)>();
 
         public MQTTClientManager()
         {
@@ -71,7 +72,7 @@ namespace Bsc_In_Stream_Conversion
                     }
                 }catch(Exception ex)
                 {
-                    Log.Error("Error sending message", ex);
+                    Log.Error("Error sending message: " + ex.Message + ex.StackTrace, ex);
                 }
             });
         }
@@ -90,14 +91,14 @@ namespace Bsc_In_Stream_Conversion
             }
             var result = await client.SubscribeAsync(new MqttTopicFilterBuilder().WithTopic(topic).Build());
             var subId = Guid.NewGuid();
-            TopicsCallbacks.Add(subId, (topic, messageCallback));
+            TopicsCallbacks.TryAdd(subId, (topic, messageCallback));
             return subId;
         }
 
         public async Task Unsubscribe(Guid subId)
         {
             var topic = TopicsCallbacks[subId].Item1;
-            TopicsCallbacks.Remove(subId);
+            TopicsCallbacks.TryRemove(subId, out var _);
             if (TopicsCallbacks.Values.Where(x => x.Item1 == topic).Count() == 0)
             {
                 await client.UnsubscribeAsync(topic);
