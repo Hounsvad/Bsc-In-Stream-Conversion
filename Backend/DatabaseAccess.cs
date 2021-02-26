@@ -288,6 +288,108 @@ namespace Bsc_In_Stream_Conversion
                 connectionPool.Release();
             }
             throw new Exception("Something Unexpected happened");
-        } 
+        }
+
+        internal async Task<List<Unit>> SelectUnitByUnitName(string UnitName)
+        {
+            if (UnitName == null) throw new ArgumentNullException("UnitName Cannot be null");
+            if (UnitName.Length == 0) throw new ArgumentException("UnitName Cannot be empty");
+
+            UnitName = "%" + UnitName + "%";
+
+            try
+            {
+                using var connection = await getConnection();
+                List<Unit> unitList = new List<Unit>();
+                await using (var cmd = new NpgsqlCommand("SELECT * FROM \"Units\" WHERE \"UnitName\" ilike @UnitName ", connection))
+                {
+                    cmd.Parameters.AddWithValue("UnitName", NpgsqlTypes.NpgsqlDbType.Varchar, UnitName);
+                    try
+                    {
+                        using NpgsqlDataReader reader = cmd.ExecuteReader();
+                        while (reader.Read())
+                        {
+                            var unit = new Unit();
+                            unit.UnitName = reader.GetString(reader.GetOrdinal("UnitName"));
+                            unit.Description = reader.GetString(reader.GetOrdinal("Description"));
+                            unit.SystemName = reader.GetString(reader.GetOrdinal("SystemName"));
+                            unit.ConversionMultiplier = reader.GetDecimal(reader.GetOrdinal("ConversionMultiplier"));
+                            //unit.Symbol = reader.GetString(reader.GetOrdinal("Symbol"));  Not needed so far throws exception when null
+                            unit.ConversionOffset = reader.GetDecimal(reader.GetOrdinal("ConversionOffset"));
+                            unitList.Add(unit);
+                        }
+                    }
+                    catch (DbException e)
+                    {
+                        Console.Error.WriteLine("Errro Message: " + e.Message);
+                        Console.Error.WriteLine(e.StackTrace);
+                        Console.Error.Flush();
+                    }
+                }
+                foreach (var unit in unitList)
+                {
+                    DimensionVector dimensionVector = new DimensionVector();
+                    unit.DimensionVector = dimensionVector;
+                    await using (var cmd = new NpgsqlCommand("SELECT * FROM \"DimensionVectors\" WHERE \"SystemName\" = @SystemName ", connection))
+                    {
+                        cmd.Parameters.AddWithValue("SystemName", NpgsqlTypes.NpgsqlDbType.Varchar, unit.SystemName);
+                        try
+                        {
+                            using NpgsqlDataReader reader = cmd.ExecuteReader();
+                            if (reader.Read())
+                            {
+                                dimensionVector.AmountOfSubstance = reader.GetInt16(reader.GetOrdinal("AmountOfSubstance"));
+                                dimensionVector.Dimensionless = reader.GetInt16(reader.GetOrdinal("Dimensionless"));
+                                dimensionVector.ElectricCurrent = reader.GetInt16(reader.GetOrdinal("ElectricCurrent"));
+                                dimensionVector.Length = reader.GetInt16(reader.GetOrdinal("Length"));
+                                dimensionVector.LuminousIntensity = reader.GetInt16(reader.GetOrdinal("LuminousIntensity"));
+                                dimensionVector.Mass = reader.GetInt16(reader.GetOrdinal("Mass"));
+                                dimensionVector.Temperature = reader.GetInt16(reader.GetOrdinal("Temperature"));
+                                dimensionVector.Time = reader.GetInt16(reader.GetOrdinal("Time"));
+                            }
+                        }
+                        catch (DbException e)
+                        {
+                            Log.Error(e.Message + e.StackTrace);
+                            Console.Error.WriteLine("Errro Message: " + e.Message);
+                            Console.Error.WriteLine(e.StackTrace);
+                            Console.Error.Flush();
+                        }
+                    }
+                    List<string> quantityKinds = new List<string>();
+                    unit.QuantityKinds = quantityKinds;
+                    await using (var cmd = new NpgsqlCommand("SELECT * FROM \"QuantityKind\" WHERE \"SystemName\" = @SystemName ", connection))
+                    {
+                        cmd.Parameters.AddWithValue("SystemName", NpgsqlTypes.NpgsqlDbType.Varchar, unit.SystemName);
+                        try
+                        {
+                            using NpgsqlDataReader reader = cmd.ExecuteReader();
+                            while (reader.Read())
+                            {
+                                quantityKinds.Add(reader.GetString(reader.GetOrdinal("Name")));
+                            }
+                        }
+                        catch (DbException e)
+                        {
+                            Log.Error(e.Message + e.StackTrace);
+                            Console.Error.WriteLine("Errro Message: " + e.Message);
+                            Console.Error.WriteLine(e.StackTrace);
+                            Console.Error.Flush();
+                        }
+                    }
+                }
+                return unitList;
+            }
+            catch (DbException e)
+            {
+                Log.Error(e.Message + e.StackTrace);
+                Console.Error.WriteLine(e.Message + Environment.NewLine + e.StackTrace);
+            }
+            finally
+            {
+                connectionPool.Release();
+            }
+            throw new Exception("Something Unexpected happened");
+        }
     }
 }

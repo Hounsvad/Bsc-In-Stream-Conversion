@@ -14,11 +14,13 @@ namespace Bsc_In_Stream_Conversion.Controllers
     {
         private readonly IUnitConverter unitConverter;
         private readonly UnitFactory unitFactory;
+        private readonly DatabaseAccess db;
 
-        public UnitController(IUnitConverter unitConverter, UnitFactory unitFactory)
+        public UnitController(IUnitConverter unitConverter, UnitFactory unitFactory, DatabaseAccess db)
         {
             this.unitConverter = unitConverter;
             this.unitFactory = unitFactory;
+            this.db = db;
         }
 
         [HttpGet("{FromSystemName}/{ToSystemName}/{Value}")]
@@ -48,6 +50,13 @@ namespace Bsc_In_Stream_Conversion.Controllers
                 Log.Error(e.Message + "\n" + e.StackTrace);
                 return Problem();
             }
+        }
+
+        [HttpGet("{UnitName}")]
+        public async Task<IActionResult> GetInfo(string UnitName)
+        {
+            var unit = await db.SelectUnitByUnitName(UnitName);
+            return Ok(unit);
         }
     }
 }
