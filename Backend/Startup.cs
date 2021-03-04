@@ -72,6 +72,8 @@ namespace Bsc_In_Stream_Conversion
             });
 
             lifetime.ApplicationStopped.Register(OnShutdown);
+
+            PerformanceMeasurer.StartTime = DateTimeOffset.UtcNow.ToString();
         }
 
         private void OnShutdown()

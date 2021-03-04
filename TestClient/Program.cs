@@ -1,46 +1,76 @@
 ﻿
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace SignalRClient
 {
     class Program
     {
-        private static HubConnection conn;
+        private static List<HubConnection> conns = new List<HubConnection>();
         static async Task Main(string[] args)
         {
-            conn = new HubConnectionBuilder()
-                .WithAutomaticReconnect()
-                .WithUrl("https://localhost:44380/SubscribeHub")
-                .Build();
-
-            conn.On<string>("NewData", data =>
+            while (true)
             {
-                Console.WriteLine(data);
+                for (int i = 0; i < 50; i++)
+                {
+                    await CreateClient();
+                }
+                Thread.Sleep(60000);
+            }
+        }
+
+        private static async Task CreateClient()
+        {
+            Console.WriteLine($"Live clients: {conns.Count}");
+            await Task.Run(async () =>
+            {
+                HubConnection conn = new HubConnectionBuilder()
+               .WithAutomaticReconnect()
+               .WithUrl("https://home.hounsvad.dk:44380/SubscribeHub", (opts) =>
+               {
+                   opts.HttpMessageHandlerFactory = (message) =>
+                   {
+                       if (message is HttpClientHandler clientHandler)
+                           // bypass SSL certificate
+                           clientHandler.ServerCertificateCustomValidationCallback +=
+                           (sender, certificate, chain, sslPolicyErrors) => { return true; };
+                       return message;
+                   };
+               })
+               .Build();
+
+                conns.Add(conn);
+
+                conn.On<string>("NewData", data =>
+                {
+                    //Console.WriteLine(data);
+                });
+
+                try
+                {
+                    await conn.StartAsync();
+                    //Console.WriteLine("Connection started");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
+
+                try
+                {
+                    await conn.InvokeAsync("SubscribeTo", "Hounsvad%2Fpi%2Fcputemp%2FDEG_C", "K");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
+                }
             });
-
-            try
-            {
-                await conn.StartAsync();
-                Console.WriteLine("Connection started");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
-            }
-
-            try
-            {
-                await conn.InvokeAsync("SubscribeTo", "Hounsvad%2Fpi%2Fcputemp%2FDEG_C", "K");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
-            }
-            while (true) ;
         }
     }
 }

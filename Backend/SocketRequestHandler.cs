@@ -49,16 +49,22 @@ namespace Bsc_In_Stream_Conversion
         {
             try
             {
+#if PERFORMANCE
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
+#endif
                 var value = decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
-
+                
                 var convertedValue = toUnit.ConvertFromBaseValue(FromUnit.ConvertToBaseValue(value));
 
                 await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
+#if PERFORMANCE
                 timer.Stop();
-                Log.Information($"Elapsed ticks: {timer.ElapsedTicks} frequency: {Stopwatch.Frequency}");
-            }catch(Exception e)
+                PerformanceMeasurer.Log(mqttClientManager.GetCurrentThreadCount(), timer.ElapsedMilliseconds, Thread.CurrentThread.ManagedThreadId);
+                PerformanceMeasurer.DumpLog();
+#endif
+            }
+            catch (Exception e)
             {
                 Log.Error("Error sending message " + e.StackTrace, e);
             }

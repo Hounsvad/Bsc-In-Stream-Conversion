@@ -3,6 +3,11 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Bsc_In_Stream_Conversion</RootNamespace>
+    <Configurations>Debug;Release;PerformanceMeasurering</Configurations>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PerformanceMeasurering|AnyCPU'">
+    <DefineConstants>TRACE;PERFORMANCE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
