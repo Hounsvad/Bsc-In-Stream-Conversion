@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Bsc_In_Stream_Conversion.Database;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using System;
@@ -14,9 +15,9 @@ namespace Bsc_In_Stream_Conversion.Controllers
     {
         private readonly IUnitConverter unitConverter;
         private readonly UnitFactory unitFactory;
-        private readonly DatabaseAccess db;
+        private readonly IDatabaseAccess db;
 
-        public UnitController(IUnitConverter unitConverter, UnitFactory unitFactory, DatabaseAccess db)
+        public UnitController(IUnitConverter unitConverter, UnitFactory unitFactory, IDatabaseAccess db)
         {
             this.unitConverter = unitConverter;
             this.unitFactory = unitFactory;

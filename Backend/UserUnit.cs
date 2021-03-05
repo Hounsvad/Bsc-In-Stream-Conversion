@@ -41,6 +41,7 @@ namespace Bsc_In_Stream_Conversion
         public UserUnit(string name, ConversionFactor numeratorPrefixes, ConversionFactor denominatorPrefixes, decimal multiplier, decimal offSet, DimensionVector dv)
         {
             NumeratorName = name;
+            Numerator.Add(this);
             NumeratorPrefix = numeratorPrefixes;
             DenominatorPrefix = denominatorPrefixes;
             Multiplier = multiplier;

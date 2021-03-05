@@ -1,4 +1,5 @@
 using Bsc_In_Stream_Conversion.Controllers;
+using Bsc_In_Stream_Conversion.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -40,7 +41,7 @@ namespace Bsc_In_Stream_Conversion
             });
             services.AddTransient<IUnitConverter, UnitConverter>();
             services.AddSingleton<IStreamClientManager, MQTTClientManager>();
-            services.AddSingleton<DatabaseAccess>();
+            services.AddSingleton<IDatabaseAccess, DatabaseAccess>();
             services.AddSingleton<UnitFactory>();
             
             services.AddScoped<SocketRequestHandler>();
