@@ -1,6 +1,6 @@
-﻿@echo off
+@echo off
 :beginning
-start "TestClientInstance" TestClient.exe
+start /MIN "Test Client" TestClient.exe
 pause
 timeout 60
-goto beginning
+GOTO beginning
