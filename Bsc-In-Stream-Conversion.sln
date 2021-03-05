@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestClient", "TestClient\Te
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bsc-In-Stream-Conversion", "Backend\Bsc-In-Stream-Conversion.csproj", "{5939EF99-FD83-4846-9AF1-78243C903F1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XunitTests", "XunitTests\XunitTests.csproj", "{EE264261-0B15-40FA-9C8D-14ED5E8FD473}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "XunitTests", "XunitTests\XunitTests.csproj", "{EE264261-0B15-40FA-9C8D-14ED5E8FD473}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MeasurementScraper", "MeasurementScraper\MeasurementScraper.csproj", "{B46B89EF-A71A-4C91-AFEC-A26441D1FD17}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -34,6 +36,12 @@ Global
 		{EE264261-0B15-40FA-9C8D-14ED5E8FD473}.PerformanceMeasurering|Any CPU.Build.0 = Debug|Any CPU
 		{EE264261-0B15-40FA-9C8D-14ED5E8FD473}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE264261-0B15-40FA-9C8D-14ED5E8FD473}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B46B89EF-A71A-4C91-AFEC-A26441D1FD17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B46B89EF-A71A-4C91-AFEC-A26441D1FD17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B46B89EF-A71A-4C91-AFEC-A26441D1FD17}.PerformanceMeasurering|Any CPU.ActiveCfg = Debug|Any CPU
+		{B46B89EF-A71A-4C91-AFEC-A26441D1FD17}.PerformanceMeasurering|Any CPU.Build.0 = Debug|Any CPU
+		{B46B89EF-A71A-4C91-AFEC-A26441D1FD17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B46B89EF-A71A-4C91-AFEC-A26441D1FD17}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

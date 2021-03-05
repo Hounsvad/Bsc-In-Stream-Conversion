@@ -40,7 +40,7 @@ namespace Bsc_In_Stream_Conversion
                 IsRunning = true;
                 await Task.Delay(60000);
                 //using (var fs = File.Create(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + $"/UnitPerformance/{StartTime}Dump{++NumberOfLogFiles}.txt"))
-                using (var fs = new StreamWriter(new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + $"/UnitPerformance/{StartTime}Dump{++NumberOfLogFiles}.txt", FileMode.OpenOrCreate)))
+                using (var fs = new StreamWriter(new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + $"/UnitPerformance/{StartTime}Dump{++NumberOfLogFiles:000}.txt", FileMode.OpenOrCreate)))
                 {
                     _lock.WaitOne();
                     var array = log.ToArray();

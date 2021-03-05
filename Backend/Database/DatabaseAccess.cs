@@ -10,8 +10,8 @@ using System.Threading.Tasks;
 namespace Bsc_In_Stream_Conversion.Database
 {
     public class DatabaseAccess : IDatabaseAccess
-    {
-        readonly String connString = "Host=hattie.db.elephantsql.com;Username=ipnajzyj;Password=ESeXjzWr6q1onkepNgbFiLzh8EQEm8pF;Database=ipnajzyj";
+    {//hattie.db.elephantsql.com
+        readonly String connString = "Host=192.168.0.112;Username=ipnajzyj;Password=ESeXjzWr6q1onkepNgbFiLzh8EQEm8pF;Database=ipnajzyj";
 
         private Semaphore connectionPool = new Semaphore(5, 5);
 
