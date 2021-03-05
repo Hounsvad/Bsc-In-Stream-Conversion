@@ -42,7 +42,15 @@ namespace Bsc_In_Stream_Conversion
 
         internal void Unsubscribe()
         {
-            mqttClientManager.Unsubscribe(subscribtionId);
+
+            try
+            {
+                mqttClientManager.Unsubscribe(subscribtionId);
+            }
+            catch(Exception e)
+            {
+                Log.Error(e.Message + ":" + e.StackTrace);
+            }
         }
 
         private async Task HandleNewMessage(string message)
@@ -60,7 +68,7 @@ namespace Bsc_In_Stream_Conversion
                 await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
 #if PERFORMANCE
                 timer.Stop();
-                PerformanceMeasurer.Log(mqttClientManager.GetCurrentThreadCount(), timer.ElapsedMilliseconds, Thread.CurrentThread.ManagedThreadId);
+                PerformanceMeasurer.Log(mqttClientManager.GetCurrentThreadCount(), timer.ElapsedTicks, Thread.CurrentThread.ManagedThreadId);
                 PerformanceMeasurer.DumpLog();
 #endif
             }

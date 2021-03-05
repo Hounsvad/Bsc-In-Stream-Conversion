@@ -10,4 +10,10 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Run.bat">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

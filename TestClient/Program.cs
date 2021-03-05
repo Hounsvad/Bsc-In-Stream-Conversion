@@ -14,14 +14,11 @@ namespace SignalRClient
         static async Task Main(string[] args)
         {
             Console.WriteLine("Starting...");
-            while (true)
+            for (int i = 0; i < 50; i++)
             {
-                for (int i = 0; i < 50; i++)
-                {
-                    i = await CreateClient(i);
-                }
-                Thread.Sleep(60000);
+                i = await CreateClient(i);
             }
+            var bob = Console.ReadLine();
         }
 
         private static async Task<int> CreateClient(int i)

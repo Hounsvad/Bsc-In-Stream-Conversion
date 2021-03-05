@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Bsc_In_Stream_Conversion.Controllers
     {
         private IStreamClientManager mqttClientManager;
         private SocketRequestHandler socketRequestHandler;
+        private static int counter = 0;
         
 
         public SubscribeHub(IStreamClientManager mqttClientManager, SocketRequestHandler socketRequestHandler)
@@ -28,9 +30,18 @@ namespace Bsc_In_Stream_Conversion.Controllers
                 await socketRequestHandler.Subscribe(topicTranslated, ToUnit, Clients.Caller.SendCoreAsync);
             }catch(Exception e)
             {
+                Log.Error(e.Message + ":" + e.StackTrace);
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
             }
+        }
+
+        public override Task OnConnectedAsync()
+        {
+            ++counter;
+            Console.WriteLine("Counter: " + counter);
+            Log.Debug("Counter: " + counter);
+            return base.OnConnectedAsync();
         }
 
         public override Task OnDisconnectedAsync(Exception exception)
