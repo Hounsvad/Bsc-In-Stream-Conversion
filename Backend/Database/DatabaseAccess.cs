@@ -7,14 +7,14 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Bsc_In_Stream_Conversion
+namespace Bsc_In_Stream_Conversion.Database
 {
-    public class DatabaseAccess
+    public class DatabaseAccess : IDatabaseAccess
     {
         readonly String connString = "Host=hattie.db.elephantsql.com;Username=ipnajzyj;Password=ESeXjzWr6q1onkepNgbFiLzh8EQEm8pF;Database=ipnajzyj";
 
         private Semaphore connectionPool = new Semaphore(5, 5);
-        
+
         private async Task<NpgsqlConnection> getConnection()
         {
             connectionPool.WaitOne();
@@ -26,9 +26,9 @@ namespace Bsc_In_Stream_Conversion
         public async Task<int> InsertUnitsAsync(IEnumerable<Unit> units)
         {
             int succesfulInserts = 0;
-            foreach(var unit in units)
+            foreach (var unit in units)
             {
-                if(await InsertUnitAsync(unit))
+                if (await InsertUnitAsync(unit))
                 {
                     succesfulInserts++;
                 }
@@ -40,7 +40,8 @@ namespace Bsc_In_Stream_Conversion
         {
             bool wasSuccesful = true;
             wasSuccesful = wasSuccesful && await InsertUnitAsync(unit.UnitName, unit.SystemName, unit.Description, unit.Symbol, unit.ConversionMultiplier, unit.ConversionOffset);
-            if (unit.DimensionVector != null) {
+            if (unit.DimensionVector != null)
+            {
                 wasSuccesful = wasSuccesful && await InsertDimenstionVectorAsync(unit.SystemName,
                                                                  unit.DimensionVector.AmountOfSubstance,
                                                                  unit.DimensionVector.ElectricCurrent,
@@ -49,16 +50,16 @@ namespace Bsc_In_Stream_Conversion
                                                                  unit.DimensionVector.Mass,
                                                                  unit.DimensionVector.Temperature,
                                                                  unit.DimensionVector.Time,
-                                                                 unit.DimensionVector.Dimensionless); 
+                                                                 unit.DimensionVector.Dimensionless);
             }
-            foreach(var quantityKind in unit.QuantityKinds)
+            foreach (var quantityKind in unit.QuantityKinds)
             {
                 wasSuccesful = wasSuccesful && await InsertQuantityKindAsync(unit.SystemName, quantityKind);
             }
             return wasSuccesful;
         }
 
-        #nullable enable
+#nullable enable
         internal async Task<bool> InsertUnitAsync(string UnitName, string SystemName, string? Description, string? Symbol, decimal ConversionMultiplier, decimal ConversionOffset)
         {
             if (SystemName.Length == 0 || ConversionMultiplier == 0)
@@ -106,11 +107,12 @@ namespace Bsc_In_Stream_Conversion
                 try
                 {
                     int returnValue = await cmd.ExecuteNonQueryAsync();
-                    if(returnValue != 0)
+                    if (returnValue != 0)
                     {
                         return true;
                     }
-                }catch(DbException e)
+                }
+                catch (DbException e)
                 {
                     Log.Error(e.Message + e.StackTrace);
                     Console.Error.WriteLine("Errro Message: " + e.Message);
@@ -175,7 +177,7 @@ namespace Bsc_In_Stream_Conversion
 
             //INSERT INTO "Units" ("UnitName", "SystemName", "Description", "Symbol", "ConversionMultiplier") VALUES ('Carlos', 'CLS', 'Unit measure of carlos', null, 1)
             await using (var cmd = new NpgsqlCommand("INSERT INTO \"QuantityKind\" (\"SystemName\", \"Name\") VALUES (@SystemName, @Name)", conn))
-            { 
+            {
                 cmd.Parameters.AddWithValue("SystemName", NpgsqlTypes.NpgsqlDbType.Varchar, SystemName);
                 cmd.Parameters.AddWithValue("Name", NpgsqlTypes.NpgsqlDbType.Varchar, Name);
                 cmd.Prepare();
@@ -198,7 +200,7 @@ namespace Bsc_In_Stream_Conversion
             return false;
         }
 
-        internal async Task<Unit> SelectUnit(string SystemName)
+        public async Task<Unit> SelectUnit(string SystemName)
         {
             if (SystemName == null) throw new ArgumentNullException("SystemName Cannot be null");
             if (SystemName.Length == 0) throw new ArgumentException("SystemName Cannot be empty");
@@ -290,7 +292,7 @@ namespace Bsc_In_Stream_Conversion
             throw new Exception("Something Unexpected happened");
         }
 
-        internal async Task<List<Unit>> SelectUnitByUnitName(string UnitName)
+        public async Task<List<Unit>> SelectUnitByUnitName(string UnitName)
         {
             if (UnitName == null) throw new ArgumentNullException("UnitName Cannot be null");
             if (UnitName.Length == 0) throw new ArgumentException("UnitName Cannot be empty");

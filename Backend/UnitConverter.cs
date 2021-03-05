@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Bsc_In_Stream_Conversion.Database;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,9 +10,9 @@ namespace Bsc_In_Stream_Conversion
 {
     public class UnitConverter : IUnitConverter
     {
-        private DatabaseAccess db;
+        private IDatabaseAccess db;
 
-        public UnitConverter(DatabaseAccess db)
+        public UnitConverter(IDatabaseAccess db)
         {
             this.db = db;
         }

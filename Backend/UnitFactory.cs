@@ -1,4 +1,5 @@
-﻿using Bsc_In_Stream_Conversion.Lookup;
+﻿using Bsc_In_Stream_Conversion.Database;
+using Bsc_In_Stream_Conversion.Lookup;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +10,9 @@ namespace Bsc_In_Stream_Conversion
 {
     public class UnitFactory
     {
-        private DatabaseAccess db;
+        private IDatabaseAccess db;
 
-        public UnitFactory(DatabaseAccess db)
+        public UnitFactory(IDatabaseAccess db)
         {
             this.db = db;
         }
