@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -8,6 +9,7 @@ namespace MeasurementScraper
     {
         static void Main(string[] args)
         {
+            Dictionary<int, List<string>> entriesList = new Dictionary<int, List<string>>();
             var InputDirectoryPath = args[0];
             var OutputDirectoryPath = args[1];
             using (var sw = new StreamWriter(new FileStream(OutputDirectoryPath + "\\combinedMeasurementOutput.txt", FileMode.OpenOrCreate))) {
@@ -27,12 +29,29 @@ namespace MeasurementScraper
                             var entries = line.Split(':');
                             if(entries.Length>=5 && int.Parse(entries[1])%50 == 0)
                             {
-                                sw.WriteLine($"{entries[1]},{entries[3]},{entries[5]}");
+                                int key = int.Parse(entries[1]);
+                                if (entriesList.ContainsKey(key))
+                                {
+                                    entriesList[key].Add($"{entries[1]},{entries[3]},{entries[5]}");
+                                }
+                                else
+                                {
+                                    entriesList.Add(key, new List<string>() { $"{entries[1]},{entries[3]},{entries[5]}" });
+                                }
                             }
                         }
-                        sw.Flush();
                     }
                 }
+
+                foreach (var e in entriesList)
+                {
+                    Console.WriteLine($"Writing {e.Key}s");
+                    foreach (var entry in e.Value.Skip(e.Value.Count()/2).Take(2000))
+                    {
+                        sw.WriteLine(entry);
+                    }
+                }
+                sw.Flush();
             }
         }
     }
