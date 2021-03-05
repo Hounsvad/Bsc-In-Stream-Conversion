@@ -13,20 +13,21 @@ namespace SignalRClient
         private static List<HubConnection> conns = new List<HubConnection>();
         static async Task Main(string[] args)
         {
+            Console.WriteLine("Starting...");
             while (true)
             {
                 for (int i = 0; i < 50; i++)
                 {
-                    await CreateClient();
+                    i = await CreateClient(i);
                 }
                 Thread.Sleep(60000);
             }
         }
 
-        private static async Task CreateClient()
+        private static async Task<int> CreateClient(int i)
         {
-            Console.WriteLine($"Live clients: {conns.Count}");
-            await Task.Run(async () =>
+            Console.WriteLine($"Live clients: {conns.Count + 1}");
+            return await await Task<Task<int>>.Factory.StartNew(async () =>
             {
                 HubConnection conn = new HubConnectionBuilder()
                .WithAutomaticReconnect()
@@ -59,6 +60,8 @@ namespace SignalRClient
                 {
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
+                    conns.Remove(conn);
+                    return i--;
                 }
 
                 try
@@ -69,7 +72,10 @@ namespace SignalRClient
                 {
                     Console.WriteLine(e.Message);
                     Console.WriteLine(e.StackTrace);
+                    conns.Remove(conn);
+                    return i--;
                 }
+                return i;
             });
         }
     }
