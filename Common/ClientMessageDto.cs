@@ -13,5 +13,14 @@ namespace Common
         public Guid ReadingId { get; set; }
         public int ThreadId { get; set;}
         public int NumberOfThreads { get; set; }
+
+        public ClientMessageDto(ReadingDto reading, int threadId, int numberOfThreads, decimal newValue)
+        {
+            TimeOfReading = reading.TimeOfReading;
+            ReadingId = reading.ReadingId;
+            ThreadId = threadId;
+            NumberOfThreads = numberOfThreads;
+            Reading = newValue;
+        }
     }
 }

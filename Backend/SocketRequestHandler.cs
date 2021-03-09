@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using Common;
+using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -57,19 +59,22 @@ namespace Bsc_In_Stream_Conversion
         {
             try
             {
-#if PERFORMANCE
+#if PERFORMANCE || false
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
 #endif
-                var value = decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                var msgObject = JsonConvert.DeserializeObject<ReadingDto>(message);
+                var value = msgObject.Reading;
                 
                 var convertedValue = toUnit.ConvertFromBaseValue(FromUnit.ConvertToBaseValue(value));
-#if PERFORMANCE
+
+                var clientMessage = new ClientMessageDto(msgObject, Thread.CurrentThread.ManagedThreadId, mqttClientManager.GetCurrentThreadCount(), convertedValue);
+#if PERFORMANCE || false
                 timer.Stop();
                 PerformanceMeasurer.Log(mqttClientManager.GetCurrentThreadCount(), timer.ElapsedTicks, Thread.CurrentThread.ManagedThreadId);
                 PerformanceMeasurer.DumpLog();
 #endif
-                await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
+                await answerCallback("NewData", new object[] { JsonConvert.SerializeObject(clientMessage) }, CancellationToken.None);
 
             }
             catch (Exception e)

@@ -8,7 +8,7 @@ namespace Common
 {
     public class ReadingDto
     {
-        public DateTimeOffset TimeOfReading { get; set; }
+        public long TimeOfReading { get; set; }
         public decimal Reading { get; set; }
         public Guid ReadingId { get; set; }
     }
