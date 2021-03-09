@@ -64,13 +64,13 @@ namespace Bsc_In_Stream_Conversion
                 var value = decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
                 
                 var convertedValue = toUnit.ConvertFromBaseValue(FromUnit.ConvertToBaseValue(value));
-
-                await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
 #if PERFORMANCE
                 timer.Stop();
                 PerformanceMeasurer.Log(mqttClientManager.GetCurrentThreadCount(), timer.ElapsedTicks, Thread.CurrentThread.ManagedThreadId);
                 PerformanceMeasurer.DumpLog();
 #endif
+                await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
+
             }
             catch (Exception e)
             {
