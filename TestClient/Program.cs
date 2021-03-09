@@ -17,8 +17,17 @@ namespace SignalRClient
             while(conns.Count < 50) { 
                 await CreateClient();
             }
-            Console.Write("\a");
-            var bob = Console.ReadLine();
+            string input = "";
+            while(input != "exit")
+            {
+                input = Console.ReadLine();
+                switch (input)
+                {
+                    case "start":
+                    default: break;
+                }
+            }
+            
         }
 
         private static async Task CreateClient()
