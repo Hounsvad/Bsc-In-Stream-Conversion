@@ -1,5 +1,7 @@
 ﻿
+using Common;
 using Microsoft.AspNetCore.SignalR.Client;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -11,6 +13,7 @@ namespace SignalRClient
     class Program
     {
         private static List<HubConnection> conns = new List<HubConnection>();
+        private static bool currentlyMeasuring = false;
         static async Task Main(string[] args)
         {
             Console.WriteLine("Starting...");
@@ -20,10 +23,16 @@ namespace SignalRClient
             string input = "";
             while(input != "exit")
             {
-                input = Console.ReadLine();
+                input = Console.ReadLine().ToLowerInvariant();
                 switch (input)
                 {
-                    case "start":
+                    case "start": currentlyMeasuring = true;break;
+                    case "stop": currentlyMeasuring = false;break;
+                    case "dump": PerformanceMeasurer.DumpLog(); break;
+                    case "help": Console.WriteLine("start: Starts measuring incoming data\n" +
+                                                    "stop: Stops measuring incoming data\n" +
+                                                    "dump: Writes all measurements to a file\n" +
+                                                    "exit: Exits the program");break;
                     default: break;
                 }
             }
@@ -54,7 +63,10 @@ namespace SignalRClient
 
                 conn.On<string>("NewData", data =>
                 {
-                    //Console.WriteLine(data);
+                    if (currentlyMeasuring)
+                    {
+                        PerformanceMeasurer.Log(JsonConvert.DeserializeObject<ClientMessageDto>(data), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                    }
                 });
 
                 try

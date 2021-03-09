@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -14,20 +15,15 @@ namespace SignalRClient
     {
         private static int NumberOfLogFiles = 0;
         public static string StartTime = "";
-        private static ConcurrentQueue<Entry> log = new ConcurrentQueue<Entry>();
+        private static ConcurrentQueue<ClientMessageDto> log = new ConcurrentQueue<ClientMessageDto>();
         private static bool IsRunning = false;
         private static Semaphore _lock = new Semaphore(1,1);
 
-        public static void Log(int NumberOfThreads, long Ticks, int ThreadId)
+        public static void Log(ClientMessageDto msg, long timeOfRetrieval)
         {
+            msg.TimeOfReading = timeOfRetrieval - msg.TimeOfReading;
             _lock.WaitOne();
-            var e = new Entry()
-            {
-                NumberOfThreads = NumberOfThreads,
-                Ticks = Ticks,
-                ThreadId = ThreadId
-            };
-            log.Enqueue(e);
+            log.Enqueue(msg);
             _lock.Release();
         }
 
@@ -43,12 +39,12 @@ namespace SignalRClient
                 {
                     _lock.WaitOne();
                     var array = log.ToArray();
-                    log = new ConcurrentQueue<Entry>();
+                    log = new ConcurrentQueue<ClientMessageDto>();
                     _lock.Release();
                     fs.Write("Tickrate: " + Stopwatch.Frequency+"\n");
                     foreach (var entry in array)
                     {
-                        fs.Write($"NumberOfThreads:{entry.NumberOfThreads}:Ticks:{entry.Ticks}:ThreadId:{entry.ThreadId}\n");
+                        fs.Write($"NumberOfThreads:{entry.NumberOfThreads}:Time:{entry.TimeOfReading}:ThreadId:{entry.ThreadId}:ReadingId:{entry.ReadingId}\n");
                     }
                     fs.Flush();
                     fs.Close();
@@ -58,15 +54,10 @@ namespace SignalRClient
             catch (Exception e)
             {
                 _lock.Release();
-                Serilog.Log.Error(e.Message + ":" + e.StackTrace);
+                Console.WriteLine();
+                Console.WriteLine(e.Message + ":" + e.StackTrace);
+                Console.WriteLine();
             }
-        }
-
-        private class Entry
-        {
-            public int NumberOfThreads { get; set; }
-            public long Ticks { get; set; }
-            public int ThreadId { get; set; }
         }
     }
 }
