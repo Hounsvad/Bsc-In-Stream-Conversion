@@ -13,13 +13,11 @@ namespace Bsc_In_Stream_Conversion.Controllers
     [ApiController]
     public class UnitController : ControllerBase
     {
-        private readonly IUnitConverter unitConverter;
         private readonly UnitFactory unitFactory;
         private readonly IDatabaseAccess db;
 
-        public UnitController(IUnitConverter unitConverter, UnitFactory unitFactory, IDatabaseAccess db)
+        public UnitController(UnitFactory unitFactory, IDatabaseAccess db)
         {
-            this.unitConverter = unitConverter;
             this.unitFactory = unitFactory;
             this.db = db;
         }

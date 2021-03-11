@@ -1,14 +1,13 @@
-﻿
-using Common;
-using Microsoft.AspNetCore.SignalR.Client;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Common;
+using Microsoft.AspNetCore.SignalR.Client;
+using Newtonsoft.Json;
 
-namespace SignalRClient
+namespace TestClient
 {
     class Program
     {

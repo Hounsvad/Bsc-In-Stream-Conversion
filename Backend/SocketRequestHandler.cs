@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Bsc_In_Stream_Conversion.MQTT;
 
 namespace Bsc_In_Stream_Conversion
 {
@@ -22,13 +23,11 @@ namespace Bsc_In_Stream_Conversion
         private UserUnit toUnit;
         private IStreamClientManager mqttClientManager;
         private Func<string, object[], CancellationToken, Task> answerCallback;
-        private IUnitConverter unitConverter;
         private readonly UnitFactory unitFactory;
 
-        public SocketRequestHandler(IStreamClientManager mqttClientManager, IUnitConverter unitConverter, UnitFactory unitFactory)
+        public SocketRequestHandler(IStreamClientManager mqttClientManager, UnitFactory unitFactory)
         {
             this.mqttClientManager = mqttClientManager;
-            this.unitConverter = unitConverter;
             this.unitFactory = unitFactory;
         }
 

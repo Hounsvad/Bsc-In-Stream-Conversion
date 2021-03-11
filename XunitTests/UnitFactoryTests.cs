@@ -1,15 +1,12 @@
-﻿using Bsc_In_Stream_Conversion;
+﻿using System;
+using System.Threading.Tasks;
+using Bsc_In_Stream_Conversion;
 using Bsc_In_Stream_Conversion.Database;
 using FluentAssertions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Test.Mocks;
 using Xunit;
+using XunitTests.Mocks;
 
-namespace Test
+namespace XunitTests
 {
     public class UnitFactoryTests
     {

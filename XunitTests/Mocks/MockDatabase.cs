@@ -1,12 +1,11 @@
-﻿using Bsc_In_Stream_Conversion;
-using Bsc_In_Stream_Conversion.Database;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using Bsc_In_Stream_Conversion.Database;
+using Bsc_In_Stream_Conversion.Model;
 
-namespace Test.Mocks
+namespace XunitTests.Mocks
 {
     public class MockDatabase : IDatabaseAccess
     {

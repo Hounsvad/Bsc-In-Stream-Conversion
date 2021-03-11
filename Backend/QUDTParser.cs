@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Bsc_In_Stream_Conversion.Model;
 
 namespace Bsc_In_Stream_Conversion
 {

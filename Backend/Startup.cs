@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Bsc_In_Stream_Conversion.MQTT;
 
 namespace Bsc_In_Stream_Conversion
 {
@@ -39,7 +40,6 @@ namespace Bsc_In_Stream_Conversion
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bsc_In_Stream_Conversion", Version = "v1" });
             });
-            services.AddTransient<IUnitConverter, UnitConverter>();
             services.AddSingleton<IStreamClientManager, MQTTClientManager>();
             services.AddSingleton<IDatabaseAccess, DatabaseAccess>();
             services.AddSingleton<UnitFactory>();

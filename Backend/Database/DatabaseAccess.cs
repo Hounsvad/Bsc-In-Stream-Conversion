@@ -6,12 +6,13 @@ using System.Data.Common;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Bsc_In_Stream_Conversion.Model;
 
 namespace Bsc_In_Stream_Conversion.Database
 {
     public class DatabaseAccess : IDatabaseAccess
     {//hattie.db.elephantsql.com
-        readonly String connString = "Host=192.168.0.112;Username=ipnajzyj;Password=ESeXjzWr6q1onkepNgbFiLzh8EQEm8pF;Database=ipnajzyj";
+        private readonly String connString = "Host=192.168.0.112;Username=ipnajzyj;Password=ESeXjzWr6q1onkepNgbFiLzh8EQEm8pF;Database=ipnajzyj";
 
         private Semaphore connectionPool = new Semaphore(5, 5);
 
@@ -42,7 +43,7 @@ namespace Bsc_In_Stream_Conversion.Database
             wasSuccesful = wasSuccesful && await InsertUnitAsync(unit.UnitName, unit.SystemName, unit.Description, unit.Symbol, unit.ConversionMultiplier, unit.ConversionOffset);
             if (unit.DimensionVector != null)
             {
-                wasSuccesful = wasSuccesful && await InsertDimenstionVectorAsync(unit.SystemName,
+                wasSuccesful = wasSuccesful && await InsertDimensionVectorAsync(unit.SystemName,
                                                                  unit.DimensionVector.AmountOfSubstance,
                                                                  unit.DimensionVector.ElectricCurrent,
                                                                  unit.DimensionVector.Length,
@@ -60,7 +61,7 @@ namespace Bsc_In_Stream_Conversion.Database
         }
 
 #nullable enable
-        internal async Task<bool> InsertUnitAsync(string UnitName, string SystemName, string? Description, string? Symbol, decimal ConversionMultiplier, decimal ConversionOffset)
+        private async Task<bool> InsertUnitAsync(string UnitName, string SystemName, string? Description, string? Symbol, decimal ConversionMultiplier, decimal ConversionOffset)
         {
             if (SystemName.Length == 0 || ConversionMultiplier == 0)
             {
@@ -124,7 +125,7 @@ namespace Bsc_In_Stream_Conversion.Database
             return false;
         }
 
-        internal async Task<bool> InsertDimenstionVectorAsync(string SystemName, short AmountOfSubstance, short ElectricCurrent, short Length, short LuminousIntensity, short Mass, short Temperature, short Time, short Dimensionless)
+        private async Task<bool> InsertDimensionVectorAsync(string SystemName, short AmountOfSubstance, short ElectricCurrent, short Length, short LuminousIntensity, short Mass, short Temperature, short Time, short Dimensionless)
         {
             if (SystemName.Length == 0)
             {
@@ -167,7 +168,7 @@ namespace Bsc_In_Stream_Conversion.Database
             return false;
         }
 
-        internal async Task<bool> InsertQuantityKindAsync(string SystemName, string Name)
+        private async Task<bool> InsertQuantityKindAsync(string SystemName, string Name)
         {
             if (Name.Length == 0 || SystemName.Length == 0)
             {

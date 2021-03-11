@@ -1,12 +1,8 @@
 ﻿using Bsc_In_Stream_Conversion;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Bsc_In_Stream_Conversion.Model;
 using static Bsc_In_Stream_Conversion.Lookup.Prefixes;
 
-namespace Test.Mocks
+namespace XunitTests.Mocks
 {
     public class MockUnits
     {

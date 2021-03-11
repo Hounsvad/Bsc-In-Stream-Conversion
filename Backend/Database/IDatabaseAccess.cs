@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Bsc_In_Stream_Conversion.Model;
 
 namespace Bsc_In_Stream_Conversion.Database
 {

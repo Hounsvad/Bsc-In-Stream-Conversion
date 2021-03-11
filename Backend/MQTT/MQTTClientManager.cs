@@ -1,16 +1,15 @@
-﻿using MQTTnet;
-using MQTTnet.Client;
-using MQTTnet.Client.Options;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using MQTTnet;
+using MQTTnet.Client;
+using MQTTnet.Client.Options;
+using Serilog;
 
-namespace Bsc_In_Stream_Conversion
+namespace Bsc_In_Stream_Conversion.MQTT
 {
     public class MQTTClientManager : IStreamClientManager
     {
