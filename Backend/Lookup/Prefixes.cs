@@ -24,7 +24,7 @@ namespace Bsc_In_Stream_Conversion.Lookup
             {
                 if (cf1.Base != cf2.Base)
                 {
-                    throw new InvalidOperationException("Cannot add convertion factors of different bases");
+                    throw new InvalidOperationException("Cannot add conversion factors of different bases");
                 }
                 return new ConversionFactor(cf1.Base, cf1.Factor + cf2.Factor);
             }
