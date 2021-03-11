@@ -56,7 +56,7 @@ namespace Bsc_In_Stream_Conversion
                                                   numeratorPrefixes:    hasPrefix ? (prefixFactor?.Item2) : ConversionFactor.One,
                                                   denominatorPrefixes:  ConversionFactor.One,
                                                   multiplier:           dbUnit.ConversionMultiplier,
-                                                  offSet:               dbUnit.ConversionOffset,
+                                                  offset:               dbUnit.ConversionOffset,
                                                   dv:                   dbUnit.DimensionVector);
 
                     if (isNumerator)
@@ -94,7 +94,7 @@ namespace Bsc_In_Stream_Conversion
                                               numeratorPrefixes: hasPrefix ? (prefixFactor?.Item2) : ConversionFactor.One,
                                               denominatorPrefixes: ConversionFactor.One,
                                               multiplier: dbUnit.ConversionMultiplier,
-                                              offSet: dbUnit.ConversionOffset,
+                                              offset: dbUnit.ConversionOffset,
                                               dv: dbUnit.DimensionVector);
 
                 if (isNumerator)

@@ -22,7 +22,7 @@ namespace Bsc_In_Stream_Conversion.Model
         {
             SystemName = unit.NumeratorName;
             ConversionMultiplier = unit.Multiplier;
-            ConversionOffset = unit.OffSet;
+            ConversionOffset = unit.Offset;
             DimensionVector = unit.DimensionVector;
         }
     }
