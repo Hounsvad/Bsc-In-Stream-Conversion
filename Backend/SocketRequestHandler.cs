@@ -68,6 +68,7 @@ namespace Bsc_In_Stream_Conversion
                 
                 var convertedValue = toUnit.ConvertFromBaseValue(FromUnit.ConvertToBaseValue(value));
 
+                
                 var clientMessage = new ClientMessageDto(msgObject, Thread.CurrentThread.ManagedThreadId, mqttClientManager.GetCurrentThreadCount(), convertedValue);
 #if PERFORMANCE || false
                 timer.Stop();

@@ -8,6 +8,7 @@ namespace Common
 {
     public class ClientMessageDto
     {
+        public ClientMessageDto() { }
         public long TimeOfReading { get; set; }
         public decimal Reading { get; set; }
         public Guid ReadingId { get; set; }

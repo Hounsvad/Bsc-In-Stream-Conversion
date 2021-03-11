@@ -12,31 +12,65 @@ namespace SignalRClient
 {
     class Program
     {
+        public static int trackTime = 30000;
+        public static int threadCount = 50;
+        public static string helpMessage = "Usage:\n" +
+        "\t-h, --help, h, help: returns this message\n" +
+        "\tFirst argument: \"auto\" if the program should start tracking, stop tracking and dump data automatically\n" +
+        "\tSecond Argument: the number that should be inserted in the dump count for the auto version";
+        public static string runningHelpMessage = "\tstart: Starts measuring incoming data\n" +
+                                                        "\tstop: Stops measuring incoming data\n" +
+                                                        "\tdump: Writes all measurements to a file\n" +
+                                                        "\texit: Exits the program\n" +
+                                                        "\thelp: Display this message";
         private static List<HubConnection> conns = new List<HubConnection>();
         private static bool currentlyMeasuring = false;
         static async Task Main(string[] args)
         {
-            Console.WriteLine("Starting...");
-            while(conns.Count < 50) { 
+            if(args.Length < 1)
+            {
+                Console.WriteLine(helpMessage);
+                return;
+            }
+            args[0] = args[0].ToLower();
+            if (args[0] == "-h" || args[0] == "--help" || args[0] == "h" || args[0] == "help")
+            {
+                Console.WriteLine(helpMessage);
+                return;
+            }
+            PerformanceMeasurer.dumpnr = int.Parse(args[1]);
+            PerformanceMeasurer.StartTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
+            Console.WriteLine($"Starting {PerformanceMeasurer.StartTime}...");
+
+            while(conns.Count < threadCount) { 
                 await CreateClient();
             }
-            string input = "";
-            while(input != "exit")
+            if(args[0] == "auto" && args.Length >= 2)
             {
-                input = Console.ReadLine().ToLowerInvariant();
-                switch (input)
+                Console.WriteLine("Starting Measurement");
+                currentlyMeasuring = true;
+                Thread.Sleep(trackTime);
+                currentlyMeasuring = false;
+                Console.WriteLine("Dumping Measurement");
+                PerformanceMeasurer.DumpLog();
+                Console.ReadLine();
+            }
+            else {
+                Console.WriteLine(runningHelpMessage);
+                string input = "";
+                while(input != "exit")
                 {
-                    case "start": currentlyMeasuring = true;break;
-                    case "stop": currentlyMeasuring = false;break;
-                    case "dump": PerformanceMeasurer.DumpLog(); break;
-                    case "help": Console.WriteLine("start: Starts measuring incoming data\n" +
-                                                    "stop: Stops measuring incoming data\n" +
-                                                    "dump: Writes all measurements to a file\n" +
-                                                    "exit: Exits the program");break;
-                    default: break;
+                    input = Console.ReadLine().ToLowerInvariant();
+                    switch (input)
+                    {
+                        case "start": currentlyMeasuring = true;break;
+                        case "stop": currentlyMeasuring = false;break;
+                        case "dump": PerformanceMeasurer.DumpLog(); break;
+                        default: Console.WriteLine(runningHelpMessage);break;
+                    }
                 }
             }
-            
+
         }
 
         private static async Task CreateClient()
@@ -63,9 +97,17 @@ namespace SignalRClient
 
                 conn.On<string>("NewData", data =>
                 {
-                    if (currentlyMeasuring)
+                    try
                     {
-                        PerformanceMeasurer.Log(JsonConvert.DeserializeObject<ClientMessageDto>(data), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                        if (currentlyMeasuring)
+                        {
+                            PerformanceMeasurer.Log(JsonConvert.DeserializeObject<ClientMessageDto>(data), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine(e.Message + e.StackTrace);
                     }
                 });
 
