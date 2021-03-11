@@ -29,7 +29,7 @@ namespace Test
             var unitFactory = new UnitFactory(db);
             var unit = await unitFactory.Parse(input);
             Math.Abs(unit.Multiplier - multiplier).Should().BeLessThan(0.0000000001m);
-            Math.Abs(unit.OffSet - offset).Should().BeLessThan(0.0000000001m);
+            Math.Abs(unit.Offset - offset).Should().BeLessThan(0.0000000001m);
         }
     }
 }

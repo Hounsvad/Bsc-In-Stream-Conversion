@@ -30,7 +30,7 @@ namespace Bsc_In_Stream_Conversion
         }
 
         public decimal Multiplier = 1;
-        public decimal OffSet = 0;
+        public decimal Offset = 0;
 
         public DimensionVector DimensionVector = new DimensionVector();
 
@@ -38,25 +38,25 @@ namespace Bsc_In_Stream_Conversion
         {
         }
 
-        public UserUnit(string name, ConversionFactor numeratorPrefixes, ConversionFactor denominatorPrefixes, decimal multiplier, decimal offSet, DimensionVector dv)
+        public UserUnit(string name, ConversionFactor numeratorPrefixes, ConversionFactor denominatorPrefixes, decimal multiplier, decimal offset, DimensionVector dv)
         {
             NumeratorName = name;
             Numerator.Add(this);
             NumeratorPrefix = numeratorPrefixes;
             DenominatorPrefix = denominatorPrefixes;
             Multiplier = multiplier;
-            OffSet = offSet;
+            Offset = offset;
             DimensionVector = dv;
         }
 
         public decimal ConvertToBaseValue(decimal value)
         {
-            return (value * Multiplier + OffSet) * PrefixFactor;
+            return (value * Multiplier + Offset) * PrefixFactor;
         }
 
         public decimal ConvertFromBaseValue(decimal value)
         {
-            return (value - OffSet) / Multiplier / PrefixFactor;
+            return (value - Offset) / Multiplier / PrefixFactor;
         }
 
         public static UserUnit operator *(UserUnit uu1, UserUnit uu2)
@@ -83,7 +83,7 @@ namespace Bsc_In_Stream_Conversion
             uu.Denominator.AddRange(uu1.Denominator);
             uu.Denominator.AddRange(uu2.Denominator);
             uu.Multiplier = uu1.Multiplier * uu2.Multiplier;
-            uu.OffSet = uu1.OffSet * uu2.Multiplier + uu2.OffSet;
+            uu.Offset = uu1.Offset * uu2.Multiplier + uu2.Offset;
             uu.NumeratorPrefix = uu1.NumeratorPrefix * uu2.NumeratorPrefix;
             uu.DenominatorPrefix = uu1.DenominatorPrefix * uu2.DenominatorPrefix;
             uu.DimensionVector = uu1.DimensionVector + uu2.DimensionVector;
@@ -113,8 +113,8 @@ namespace Bsc_In_Stream_Conversion
             uu.Numerator.AddRange(uu2.Denominator);
             uu.Denominator.AddRange(uu1.Denominator);
             uu.Denominator.AddRange(uu2.Numerator);
-            uu.Multiplier = uu1.Multiplier / (uu2.Multiplier + uu2.OffSet);
-            uu.OffSet = uu1.OffSet / (uu2.Multiplier + uu2.OffSet);
+            uu.Multiplier = uu1.Multiplier / (uu2.Multiplier + uu2.Offset);
+            uu.Offset = uu1.Offset / (uu2.Multiplier + uu2.Offset);
             uu.NumeratorPrefix = uu1.NumeratorPrefix * uu2.DenominatorPrefix;
             uu.DenominatorPrefix = uu1.DenominatorPrefix * uu2.NumeratorPrefix;
             uu.DimensionVector = uu1.DimensionVector - uu2.DimensionVector;
