@@ -22,11 +22,36 @@ namespace Bsc_In_Stream_Conversion
             var uu = new UserUnit();
             input = input.Replace(" ", "").Replace("\t", "").ToUpperInvariant();
 
-            uu = await ParseFractionPart(input.Split("/")[0], uu, true);
-            if (input.Contains("/"))
+            if (!input.Contains("/") && !input.Contains("*"))
             {
-                uu = await ParseFractionPart(input.Split("/")[1], uu, false);
+                uu = await ParseSimpleUnit(input);
             }
+            else
+            {
+                uu = await ParseFractionPart(input.Split("/")[0], uu, true);
+                if (input.Contains("/"))
+                {
+                    uu = await ParseFractionPart(input.Split("/")[1], uu, false);
+                } 
+            }
+            return uu;
+        }
+
+        private async Task<UserUnit> ParseSimpleUnit(string input)
+        {
+            FindPrefix(input, out var hasPrefix, out var prefixFactor);
+            if (hasPrefix)
+            {
+                input = input.Replace(prefixFactor?.Item1, "");
+            }
+            var dbUnit = await db.SelectUnit(input);
+
+            var uu = new UserUnit(name: input,
+                numeratorPrefixes: hasPrefix ? (prefixFactor?.Item2) : ConversionFactor.One,
+                denominatorPrefixes: ConversionFactor.One,
+                multiplier: dbUnit.ConversionMultiplier,
+                offset: dbUnit.ConversionOffset,
+                dv: dbUnit.DimensionVector);
             return uu;
         }
 
@@ -35,9 +60,7 @@ namespace Bsc_In_Stream_Conversion
             var parts = input.Split("*");
             foreach (var part in parts)
             {
-                bool hasPrefix;
-                (string, ConversionFactor)? prefixFactor;
-                FindPrefix(part, out hasPrefix, out prefixFactor);
+                FindPrefix(part, out var hasPrefix, out var prefixFactor);
 
                 if (part.Contains("^"))
                 {
@@ -56,7 +79,7 @@ namespace Bsc_In_Stream_Conversion
                                                   numeratorPrefixes:    hasPrefix ? (prefixFactor?.Item2) : ConversionFactor.One,
                                                   denominatorPrefixes:  ConversionFactor.One,
                                                   multiplier:           dbUnit.ConversionMultiplier,
-                                                  offset:               dbUnit.ConversionOffset,
+                                                  offset:               0,
                                                   dv:                   dbUnit.DimensionVector);
 
                     if (isNumerator)
@@ -67,10 +90,10 @@ namespace Bsc_In_Stream_Conversion
                     {
                         uu /= newUU;
                     }
-                    return uu;
                 }
             }
-            throw new InvalidOperationException("Something went wrong in passing the unit");
+
+            return uu;
         }
 
         private async Task<UserUnit> SeperatePowers(UserUnit uu, string part, bool hasPrefix, (string, ConversionFactor)? prefixFactor, bool isNumerator)
@@ -86,7 +109,7 @@ namespace Bsc_In_Stream_Conversion
                 string partToAdd = splitPart[0];
                 if (hasPrefix)
                 {
-                    partToAdd = part.Replace(prefixFactor?.Item1, "");
+                    partToAdd = splitPart[0].Replace(prefixFactor?.Item1, "");
                 }
                 var dbUnit = await db.SelectUnit(partToAdd);
 

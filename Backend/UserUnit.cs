@@ -15,7 +15,7 @@ namespace Bsc_In_Stream_Conversion
 
         public string Name { get {
                 var factor = NumeratorPrefix * DenominatorPrefix;
-                return Prefixes.IntegerFactor.Where(x => x.Value == factor).First().Key + NumeratorName + "/" + DenominatorName;
+                return IntegerFactor.First(x => x.Value == factor).Key + NumeratorName + "/" + DenominatorName;
             } }
         //MEGAM/(KG*DEG_C)^    FT^2/LightYear^3 = FT*FT/HR*HR*HR = FT->M 0.308*0.308/3600*3600*3600  U -> SI-Unit -> XU
         public List<UserUnit> Numerator { get; private set; } = new List<UserUnit>();
@@ -84,7 +84,6 @@ namespace Bsc_In_Stream_Conversion
             uu.Denominator.AddRange(uu1.Denominator);
             uu.Denominator.AddRange(uu2.Denominator);
             uu.Multiplier = uu1.Multiplier * uu2.Multiplier;
-            uu.Offset = uu1.Offset * uu2.Multiplier + uu2.Offset;
             uu.NumeratorPrefix = uu1.NumeratorPrefix * uu2.NumeratorPrefix;
             uu.DenominatorPrefix = uu1.DenominatorPrefix * uu2.DenominatorPrefix;
             uu.DimensionVector = uu1.DimensionVector + uu2.DimensionVector;
@@ -114,12 +113,11 @@ namespace Bsc_In_Stream_Conversion
             uu.Numerator.AddRange(uu2.Denominator);
             uu.Denominator.AddRange(uu1.Denominator);
             uu.Denominator.AddRange(uu2.Numerator);
-            uu.Multiplier = uu1.Multiplier / (uu2.Multiplier + uu2.Offset);
-            uu.Offset = uu1.Offset / (uu2.Multiplier + uu2.Offset);
+            uu.Multiplier = uu1.Multiplier / (uu2.Multiplier); // + uu2.Offset);
             uu.NumeratorPrefix = uu1.NumeratorPrefix * uu2.DenominatorPrefix;
             uu.DenominatorPrefix = uu1.DenominatorPrefix * uu2.NumeratorPrefix;
             uu.DimensionVector = uu1.DimensionVector - uu2.DimensionVector;
             return uu;
-        }
+         }
     }
 }

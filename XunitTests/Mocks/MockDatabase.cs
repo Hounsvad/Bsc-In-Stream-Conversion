@@ -20,7 +20,8 @@ namespace XunitTests.Mocks
             new Unit(MockUnits.Hour),
             new Unit(MockUnits.Kelvin),
             new Unit(MockUnits.Celsius),
-            new Unit(MockUnits.Fahrenheit)
+            new Unit(MockUnits.Fahrenheit),
+            new Unit(MockUnits.BritishThermalUnit)
         };
 
 

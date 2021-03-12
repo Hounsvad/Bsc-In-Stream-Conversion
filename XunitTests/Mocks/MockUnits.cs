@@ -23,5 +23,8 @@ namespace XunitTests.Mocks
         public static UserUnit Kelvin = new UserUnit("K", new ConversionFactor(1, 0), new ConversionFactor(1, 0), 1, 0, new DimensionVector() { Temperature = 1 });
         public static UserUnit Celsius = new UserUnit("DEG_C", new ConversionFactor(1, 0), new ConversionFactor(1, 0), 1, 273.15m, new DimensionVector() { Temperature = 1 });
         public static UserUnit Fahrenheit = new UserUnit("DEG_F", new ConversionFactor(1, 0), new ConversionFactor(1, 0), 0.5555555555555556m, 459.669607m, new DimensionVector() { Temperature = 1 });
+
+        public static UserUnit BritishThermalUnit = new UserUnit("BTU_IT", ConversionFactor.One, ConversionFactor.One,
+            1055.05585262m, 0.0m, new DimensionVector() {Length = 2, Mass = 1, Time = -2});
     }
 }

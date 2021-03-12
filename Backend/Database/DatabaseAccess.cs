@@ -12,7 +12,7 @@ namespace Bsc_In_Stream_Conversion.Database
 {
     public class DatabaseAccess : IDatabaseAccess
     {//hattie.db.elephantsql.com
-        private readonly String connString = "Host=192.168.0.112;Username=ipnajzyj;Password=ESeXjzWr6q1onkepNgbFiLzh8EQEm8pF;Database=ipnajzyj";
+        private readonly String connString = "Host=hattie.db.elephantsql.com;Username=ipnajzyj;Password=ESeXjzWr6q1onkepNgbFiLzh8EQEm8pF;Database=ipnajzyj";
 
         private Semaphore connectionPool = new Semaphore(5, 5);
 
@@ -210,7 +210,7 @@ namespace Bsc_In_Stream_Conversion.Database
             {
                 using var connection = await getConnection();
                 Unit unit = new Unit();
-                await using (var cmd = new NpgsqlCommand("SELECT * FROM \"Units\" WHERE \"SystemName\" = @SystemName ", connection))
+                await using (var cmd = new NpgsqlCommand("SELECT * FROM \"Units\" WHERE \"SystemName\" ILIKE @SystemName ", connection))
                 {
                     cmd.Parameters.AddWithValue("SystemName", NpgsqlTypes.NpgsqlDbType.Varchar, SystemName);
                     try
@@ -231,10 +231,14 @@ namespace Bsc_In_Stream_Conversion.Database
                         Console.Error.WriteLine(e.StackTrace);
                         Console.Error.Flush();
                     }
+                    catch (InvalidOperationException e)
+                    {
+                        throw new InvalidOperationException(e.Message + " SystemName: " + SystemName);
+                    }
                 }
                 DimensionVector dimensionVector = new DimensionVector();
                 unit.DimensionVector = dimensionVector;
-                await using (var cmd = new NpgsqlCommand("SELECT * FROM \"DimensionVectors\" WHERE \"SystemName\" = @SystemName ", connection))
+                await using (var cmd = new NpgsqlCommand("SELECT * FROM \"DimensionVectors\" WHERE \"SystemName\" ILIKE @SystemName ", connection))
                 {
                     cmd.Parameters.AddWithValue("SystemName", NpgsqlTypes.NpgsqlDbType.Varchar, SystemName);
                     try
@@ -256,11 +260,14 @@ namespace Bsc_In_Stream_Conversion.Database
                         Console.Error.WriteLine("Errro Message: " + e.Message);
                         Console.Error.WriteLine(e.StackTrace);
                         Console.Error.Flush();
+                    }catch (InvalidOperationException e)
+                    {
+                        throw new InvalidOperationException(e.Message + " SystemName: " + SystemName);
                     }
                 }
                 List<string> quantityKinds = new List<string>();
                 unit.QuantityKinds = quantityKinds;
-                await using (var cmd = new NpgsqlCommand("SELECT * FROM \"QuantityKind\" WHERE \"SystemName\" = @SystemName ", connection))
+                await using (var cmd = new NpgsqlCommand("SELECT * FROM \"QuantityKind\" WHERE \"SystemName\" ILIKE @SystemName ", connection))
                 {
                     cmd.Parameters.AddWithValue("SystemName", NpgsqlTypes.NpgsqlDbType.Varchar, SystemName);
                     try
@@ -277,6 +284,9 @@ namespace Bsc_In_Stream_Conversion.Database
                         Console.Error.WriteLine("Errro Message: " + e.Message);
                         Console.Error.WriteLine(e.StackTrace);
                         Console.Error.Flush();
+                    }catch (InvalidOperationException e)
+                    {
+                        throw new InvalidOperationException(e.Message + " SystemName: " + SystemName);
                     }
                 }
                 return unit;
