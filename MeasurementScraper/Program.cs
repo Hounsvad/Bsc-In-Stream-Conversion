@@ -67,7 +67,7 @@ namespace MeasurementScraper
                 {
 
                     var files = Directory.EnumerateFiles(InputDirectoryPath, "*.txt");
-                    sw.WriteLine("Threadcount,Ticks,ThreadID");
+                    sw.WriteLine("Threadcount,MilliSeconds,ThreadID");
                     sw.Flush();
                     var filecount = 0;
                     foreach (string file in files)

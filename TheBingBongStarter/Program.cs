@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace TheBingBongStarter
@@ -31,18 +33,33 @@ namespace TheBingBongStarter
 
             }
             var counter = 0;
+            List<Process> Processes = new List<Process>(); 
             while (true)
             {
-                ProcessStartInfo p_info = new ProcessStartInfo();
-                p_info.UseShellExecute = true;
-                p_info.CreateNoWindow = false;
-                //p_info.WindowStyle = ProcessWindowStyle.Minimized;
-                p_info.FileName = args[0];
-                p_info.Arguments = args[1] + " " + ++counter;
-                Process.Start(p_info);
+                Processes.Add(new Process()
+                {
+                    StartInfo = new ProcessStartInfo()
+                    {
+                        FileName = args[0],
+                        Arguments = args[1] + " " + ++counter,
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = false,
+                    }
+
+                });
+                Process p = Processes.Last();
+                p.Start();
                 Console.WriteLine("Ready to bing bong");
-                Console.ReadLine();
+                while (!p.StandardOutput.EndOfStream)
+                {
+                    if (p.StandardOutput.ReadLine().Contains("Done dumping"))
+                    {
+                        break;
+                    }
+                }
                 Console.WriteLine("Another One");
+
                 //for(int i = 60; i > 0; i--)
                 //{
                 //    await Task.Delay(1000);
