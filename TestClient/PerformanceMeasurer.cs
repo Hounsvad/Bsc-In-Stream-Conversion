@@ -45,7 +45,7 @@ namespace TestClient
                     fs.Write($"Tickrate: {Stopwatch.Frequency} Measurement Count: {array.Count} MissingMessages: {missing}\n");
                     foreach (var entry in array)
                     {
-                        fs.Write($"NumberOfThreads:{entry.NumberOfThreads}:Time:{entry.TimeOfReading}:ThreadId:{entry.ThreadId}:ReadingId:{entry.ReadingId}\n");
+                        fs.Write($"NumberOfThreads:{entry.Item2.NumberOfThreads}:Time:{entry.Item2.TimeOfReading}:ThreadId:{entry.Item2.ThreadId}:ReadingId:{entry.Item2.ReadingId}\n");
                     }
                     fs.Flush();
                     fs.Close();
