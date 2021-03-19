@@ -22,7 +22,7 @@ namespace Bsc_In_Stream_Conversion
             var uu = new UserUnit();
             input = input.Replace(" ", "").Replace("\t", "").ToUpperInvariant();
 
-            if (!input.Contains("/") && !input.Contains("*"))
+            if (!input.Contains("/") && !input.Contains("*") && !input.Contains("^"))
             {
                 uu = await ParseSimpleUnit(input);
             }
@@ -143,6 +143,7 @@ namespace Bsc_In_Stream_Conversion
                 {
                     hasPrefix = true;
                     prefixFactor = (prefix, Prefixes.IntegerFactor[prefix]);
+                    break;
                 }
             }
         }
