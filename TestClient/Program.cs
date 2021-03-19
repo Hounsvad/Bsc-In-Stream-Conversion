@@ -94,13 +94,15 @@ namespace TestClient
 
                 conns.Add(conn);
 
+                Guid clientId = Guid.NewGuid();
+                
                 conn.On<string>("NewData", data =>
                 {
                     try
                     {
                         if (currentlyMeasuring)
                         {
-                            PerformanceMeasurer.Log(JsonConvert.DeserializeObject<ClientMessageDto>(data), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                            PerformanceMeasurer.Log(JsonConvert.DeserializeObject<ClientMessageDto>(data), DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(), clientId);
 
                         }
                     }
