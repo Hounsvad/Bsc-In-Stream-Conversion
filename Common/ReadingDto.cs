@@ -11,5 +11,6 @@ namespace Common
         public long TimeOfReading { get; set; }
         public decimal Reading { get; set; }
         public Guid ReadingId { get; set; }
+        public long MessageCounterId { get; set; }
     }
 }

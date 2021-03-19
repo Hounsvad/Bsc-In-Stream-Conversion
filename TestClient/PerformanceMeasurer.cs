@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Common;
@@ -35,10 +36,18 @@ namespace TestClient
                 using (var fs = new StreamWriter(new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + $"/UnitPerformance/{StartTime}ClientDump{dumpnr:000}.txt", FileMode.OpenOrCreate)))
                 {
                     _lock.WaitOne();
-                    var array = log.ToArray();
+                    var array = log.ToList();
                     log = new ConcurrentQueue<ClientMessageDto>();
+                    int missing = 0;
+                    for(int i = 1; i < array.Count; i++) 
+                    {
+                        if (array[i] != ++array[i - 1])
+                        {
+                            missing++;
+                        }
+                    }
                     _lock.Release();
-                    fs.Write("Tickrate: " + Stopwatch.Frequency + " Measurement Count: "+array.Length + "\n");
+                    fs.Write($"Tickrate: {Stopwatch.Frequency} Measurement Count: {array.Count} MissingMessages: {missing}\n");
                     foreach (var entry in array)
                     {
                         fs.Write($"NumberOfThreads:{entry.NumberOfThreads}:Time:{entry.TimeOfReading}:ThreadId:{entry.ThreadId}:ReadingId:{entry.ReadingId}\n");
