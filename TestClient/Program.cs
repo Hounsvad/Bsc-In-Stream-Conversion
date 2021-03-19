@@ -37,6 +37,7 @@ namespace TestClient
                 Console.WriteLine(helpMessage);
                 return;
             }
+            Console.Out.Flush();
             PerformanceMeasurer.dumpnr = int.Parse(args[1]);
             PerformanceMeasurer.StartTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
             Console.WriteLine($"Starting {PerformanceMeasurer.StartTime}...");
