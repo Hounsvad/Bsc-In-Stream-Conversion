@@ -41,7 +41,7 @@ namespace TestClient
                     int missing = 0;
                     for(int i = 1; i < array.Count; i++) 
                     {
-                        if (array[i] != ++array[i - 1])
+                        if (array[i].MessageCounterId != ++array[i - 1].MessageCounterId)
                         {
                             missing++;
                         }
