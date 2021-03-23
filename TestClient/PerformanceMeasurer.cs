@@ -34,7 +34,7 @@ namespace TestClient
                 if (IsRunning) return;
                 IsRunning = true;
                 //using (var fs = File.Create(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + $"/UnitPerformance/{StartTime}Dump{++NumberOfLogFiles}.txt"))
-                using (var fs = new StreamWriter(new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + $"/UnitPerformance/{StartTime}ClientDump{dumpnr:000}.txt", FileMode.OpenOrCreate)))
+                await using (var fs = new StreamWriter(new FileStream(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + $"/UnitPerformance/{StartTime}ClientDump{dumpnr:000}.txt", FileMode.OpenOrCreate)))
                 {
                     _lock.WaitOne();
                     var array = log.ToList();
@@ -42,12 +42,12 @@ namespace TestClient
                     var missing = FindMissing(array);
 
                     _lock.Release();
-                    fs.Write($"Tickrate: {Stopwatch.Frequency} Measurement Count: {array.Count} MissingMessages: {missing}\n");
+                    await fs.WriteAsync($"Tickrate: {Stopwatch.Frequency} Measurement Count: {array.Count} MissingMessages: {missing}\n");
                     foreach (var entry in array)
                     {
-                        fs.Write($"NumberOfThreads:{entry.Item2.NumberOfThreads}:Time:{entry.Item2.TimeOfReading}:ThreadId:{entry.Item2.ThreadId}:ReadingId:{entry.Item2.ReadingId}\n");
+                        await fs.WriteAsync($"NumberOfThreads:{entry.Item2.NumberOfThreads}:Time:{entry.Item2.TimeOfReading}:ThreadId:{entry.Item2.ThreadId}:ReadingId:{entry.Item2.ReadingId}:ReadingCount:{entry.Item2.MessageCounterId}\n");
                     }
-                    fs.Flush();
+                    await fs.FlushAsync();
                     fs.Close();
                 }
                 IsRunning = false;
@@ -67,6 +67,8 @@ namespace TestClient
             Dictionary<Guid, List<ClientMessageDto>> dict = new Dictionary<Guid, List<ClientMessageDto>>();
             foreach (var msg in msgsByClients)
             {
+                //Try to add message guid as key with a list of messages initialized with a message.
+                //Upon failure add the message to the list associated with the existing key.  
                 if (!dict.TryAdd(msg.Item1, new List<ClientMessageDto>() {msg.Item2}))
                 {
                     dict[msg.Item1].Add(msg.Item2);
