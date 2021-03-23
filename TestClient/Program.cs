@@ -45,8 +45,11 @@ namespace TestClient
             while(conns.Count < threadCount) { 
                 await CreateClient();
             }
+
+            await Task.Delay(1000); //Delay the start of the logging to prevent outliers
             if(args[0] == "auto" && args.Length >= 2)
             {
+                Console.WriteLine(PerformanceMeasurer.dumpnr);
                 Console.WriteLine("Starting Measurement");
                 currentlyMeasuring = true;
                 Thread.Sleep(trackTime);

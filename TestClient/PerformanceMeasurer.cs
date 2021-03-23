@@ -42,7 +42,8 @@ namespace TestClient
                     var missing = FindMissing(array);
 
                     _lock.Release();
-                    await fs.WriteAsync($"Tickrate: {Stopwatch.Frequency} Measurement Count: {array.Count} MissingMessages: {missing}\n");
+                    //await fs.WriteAsync($"Tickrate: {Stopwatch.Frequency} Measurement Count: {array.Count} MissingMessages: {missing}\n");
+                    await fs.WriteAsync($"Measurement Count: {array.Count} MissingMessages: {missing}\n");
                     foreach (var entry in array)
                     {
                         await fs.WriteAsync($"NumberOfThreads:{entry.Item2.NumberOfThreads}:Time:{entry.Item2.TimeOfReading}:ThreadId:{entry.Item2.ThreadId}:ReadingId:{entry.Item2.ReadingId}:ReadingCount:{entry.Item2.MessageCounterId}\n");
