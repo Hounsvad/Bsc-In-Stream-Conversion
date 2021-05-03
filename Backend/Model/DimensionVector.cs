@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace Bsc_In_Stream_Conversion
+namespace Bsc_In_Stream_Conversion.Model
 {
     public class DimensionVector
     {
@@ -31,6 +28,30 @@ namespace Bsc_In_Stream_Conversion
             Time = time;
         }
 
+        public static DimensionVector operator +(DimensionVector v1, DimensionVector v2)
+        {
+            return new DimensionVector((short) (v1.AmountOfSubstance + v2.AmountOfSubstance),
+                (short) (v1.ElectricCurrent + v2.ElectricCurrent),
+                (short) (v1.Length + v2.Length),
+                (short) (v1.LuminousIntensity + v2.LuminousIntensity),
+                (short) (v1.Mass + v2.Mass),
+                (short) (v1.Temperature + v2.Temperature),
+                (short) (v1.Time + v2.Time))
+            { Dimensionless = (short) (v1.Dimensionless + v2.Dimensionless) };
+        }
+
+        public static DimensionVector operator -(DimensionVector v1, DimensionVector v2)
+        {
+            return new DimensionVector((short)(v1.AmountOfSubstance - v2.AmountOfSubstance),
+                (short)(v1.ElectricCurrent - v2.ElectricCurrent),
+                (short)(v1.Length - v2.Length),
+                (short)(v1.LuminousIntensity - v2.LuminousIntensity),
+                (short)(v1.Mass - v2.Mass),
+                (short)(v1.Temperature - v2.Temperature),
+                (short)(v1.Time - v2.Time))
+            { Dimensionless = (short)(v1.Dimensionless - v2.Dimensionless) };
+        }
+
         public static DimensionVector Parse(string s)
         {
             var v = new DimensionVector();
@@ -52,6 +73,16 @@ namespace Bsc_In_Stream_Conversion
             v.Dimensionless = short.Parse(s.Substring(indexOfD + 1));
 
             return v;
+        }
+
+        public static bool operator ==(DimensionVector v1, DimensionVector v2)
+        {
+            return v1.Equals(v2);
+        }
+
+        public static bool operator !=(DimensionVector v1, DimensionVector v2)
+        {
+            return !v1.Equals(v2);
         }
 
         public override bool Equals(object obj)

@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace Bsc_In_Stream_Conversion
+namespace Bsc_In_Stream_Conversion.MQTT
 {
-    public interface IMQTTClientManager
+    public interface IStreamClientManager
     {
         Task<Guid> Subscribe(string topic, Func<string, Task> messageCallback);
 
@@ -13,5 +11,6 @@ namespace Bsc_In_Stream_Conversion
 
         Task PublishMessageAsync(string topic, string message);
 
+        int GetCurrentThreadCount();
     }
 }

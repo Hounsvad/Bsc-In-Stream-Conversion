@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
-namespace Bsc_In_Stream_Conversion
+namespace Bsc_In_Stream_Conversion.Model
 {
     public class Unit
     {
@@ -16,5 +13,17 @@ namespace Bsc_In_Stream_Conversion
 
         public List<string> QuantityKinds = new List<string>();
         public DimensionVector DimensionVector { get; set; }
+
+        public Unit()
+        {
+        }
+
+        public Unit(UserUnit unit)
+        {
+            SystemName = unit.NumeratorName;
+            ConversionMultiplier = unit.Multiplier;
+            ConversionOffset = unit.Offset;
+            DimensionVector = unit.DimensionVector;
+        }
     }
 }

@@ -22,6 +22,7 @@ namespace Bsc_In_Stream_Conversion
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseUrls("https://home.hounsvad.dk:44380;http://home.hounsvad.dk:58328");
                 }).ConfigureLogging(logging =>
                 {
                     logging.ClearProviders();

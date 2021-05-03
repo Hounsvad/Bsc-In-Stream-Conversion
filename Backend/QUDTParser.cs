@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Bsc_In_Stream_Conversion.Database;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -6,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Bsc_In_Stream_Conversion.Model;
 
 namespace Bsc_In_Stream_Conversion
 {

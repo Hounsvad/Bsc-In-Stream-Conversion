@@ -1,4 +1,5 @@
 using Bsc_In_Stream_Conversion.Controllers;
+using Bsc_In_Stream_Conversion.Database;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -16,6 +17,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Bsc_In_Stream_Conversion.MQTT;
 
 namespace Bsc_In_Stream_Conversion
 {
@@ -38,8 +40,9 @@ namespace Bsc_In_Stream_Conversion
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Bsc_In_Stream_Conversion", Version = "v1" });
             });
-            services.AddTransient<IUnitConverter, UnitConverter>();
-            services.AddSingleton<IMQTTClientManager, MQTTClientManager>();
+            services.AddSingleton<IStreamClientManager, MQTTClientManager>();
+            services.AddSingleton<IDatabaseAccess, DatabaseAccess>();
+            services.AddSingleton<UnitFactory>();
             
             services.AddScoped<SocketRequestHandler>();
             Log.Logger = new LoggerConfiguration()
@@ -70,6 +73,8 @@ namespace Bsc_In_Stream_Conversion
             });
 
             lifetime.ApplicationStopped.Register(OnShutdown);
+
+            PerformanceMeasurer.StartTime = DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString();
         }
 
         private void OnShutdown()
