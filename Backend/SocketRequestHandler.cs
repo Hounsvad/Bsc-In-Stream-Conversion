@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Common;
 
 namespace Bsc_In_Stream_Conversion
 {
@@ -35,7 +37,7 @@ namespace Bsc_In_Stream_Conversion
             this.topic = topic;
             this.toUnit = await unitFactory.Parse(toUnit);
             this.answerCallback = answerCallback;
-            FromUnit = await unitFactory.Parse(topic.Split("/").Last().Replace("%F2", "/"));
+            FromUnit = await unitFactory.Parse(topic.Split("/").Last().Replace("47", "/"));
             subscribtionId = await mqttClientManager.Subscribe(topic, HandleNewMessage);
         }
 
@@ -48,15 +50,14 @@ namespace Bsc_In_Stream_Conversion
         {
             try
             {
-                Stopwatch timer = new Stopwatch();
-                timer.Start();
-                var value = decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                ReadingDto msg = JsonConvert.DeserializeObject<ReadingDto>(message);
 
-                var convertedValue = toUnit.ConvertFromBaseValue(FromUnit.ConvertToBaseValue(value));
+                var convertedValue = toUnit.ConvertFromBaseValue(FromUnit.ConvertToBaseValue(msg.Reading));
 
-                await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
-                timer.Stop();
-                Log.Information($"Elapsed ticks: {timer.ElapsedTicks} frequency: {Stopwatch.Frequency}");
+                //Changed to accomodate new testclient
+                //await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
+                var clientMessage = new ClientMessageDto(msg, Thread.CurrentThread.ManagedThreadId, mqttClientManager.GetCurrentThreadCount(), convertedValue);
+                await answerCallback("NewData", new object[] { JsonConvert.SerializeObject(clientMessage) }, CancellationToken.None);
             }catch(Exception e)
             {
                 Log.Error("Error sending message " + e.StackTrace, e);

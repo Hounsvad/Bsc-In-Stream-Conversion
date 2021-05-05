@@ -16,5 +16,10 @@ namespace Bsc_In_Stream_Conversion
 
         public List<string> QuantityKinds = new List<string>();
         public DimensionVector DimensionVector { get; set; }
+
+        public Unit()
+        {
+
+        }
     }
 }
