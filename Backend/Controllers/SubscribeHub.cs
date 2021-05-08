@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace Bsc_In_Stream_Conversion.Controllers
 {
@@ -12,7 +13,8 @@ namespace Bsc_In_Stream_Conversion.Controllers
     {
         private IStreamClientManager mqttClientManager;
         private SocketRequestHandler socketRequestHandler;
-        
+        private static int counter = 0;
+
 
         public SubscribeHub(IStreamClientManager mqttClientManager, SocketRequestHandler socketRequestHandler)
         {
@@ -37,6 +39,15 @@ namespace Bsc_In_Stream_Conversion.Controllers
         {
             socketRequestHandler.Unsubscribe();
             return base.OnDisconnectedAsync(exception);
+        }
+
+
+        public override Task OnConnectedAsync()
+        {
+            ++counter;
+            Console.WriteLine("Counter: " + counter);
+            Log.Debug("Counter: " + counter);
+            return base.OnConnectedAsync();
         }
     }
 }
