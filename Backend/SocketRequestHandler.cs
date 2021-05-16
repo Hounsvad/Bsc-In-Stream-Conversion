@@ -8,6 +8,8 @@ using System.Linq;
 using System.Net.WebSockets;
 using System.Threading;
 using System.Threading.Tasks;
+using Common;
+using Newtonsoft.Json;
 
 namespace Bsc_In_Stream_Conversion
 {
@@ -23,7 +25,7 @@ namespace Bsc_In_Stream_Conversion
         private Func<string, object[], CancellationToken, Task> answerCallback;
         private IUnitConverter unitConverter;
 
-        private static ConcurrentQueue<(int, long)> ResponseTimeByLiveClients = new ConcurrentQueue<(int, long)>();
+        //private static ConcurrentQueue<(int, long)> ResponseTimeByLiveClients = new ConcurrentQueue<(int, long)>();
 
         public SocketRequestHandler(IMQTTClientManager mqttClientManager, IUnitConverter unitConverter)
         {
@@ -44,10 +46,11 @@ namespace Bsc_In_Stream_Conversion
         {
             try
             {
-                Stopwatch timer = new Stopwatch();
-                timer.Start();
+                //Stopwatch timer = new Stopwatch();
+                //timer.Start();
+                var msgInObj = JsonConvert.DeserializeObject<ReadingDto>(message);
                 var userUnit = UserUnit.Parse(toUnit);
-                var value = decimal.Parse(message, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture);
+                var value = msgInObj.Reading;
 
                 var numeratorValue = await unitConverter.Convert(FromUnit.Numerator, userUnit.Numerator, value);
                 var denominatorValue = await unitConverter.Convert(FromUnit.Denominator, userUnit.Denominator, 1);
@@ -60,9 +63,12 @@ namespace Bsc_In_Stream_Conversion
 
                 var convertedValue = fromUnitPrefixfactor * toUnitPrefixfactor * numeratorValue / denominatorValue;
 
-                await answerCallback("NewData", new object[] { convertedValue.ToString() }, CancellationToken.None);
-                timer.Stop();
-                ResponseTimeByLiveClients.Enqueue((mqttClientManager.GetActiveClientsCount(), timer.ElapsedMilliseconds));
+                var clientMessage = new ClientMessageDto(msgInObj, Thread.CurrentThread.ManagedThreadId, mqttClientManager.GetActiveClientsCount(), convertedValue);
+
+                await answerCallback("NewData", new object[] { JsonConvert.SerializeObject(clientMessage) }, CancellationToken.None);
+
+                //timer.Stop();
+                //ResponseTimeByLiveClients.Enqueue((mqttClientManager.GetActiveClientsCount(), timer.ElapsedMilliseconds));
             }catch(Exception e)
             {
                 Log.Error("Error sending message " + e.StackTrace, e);

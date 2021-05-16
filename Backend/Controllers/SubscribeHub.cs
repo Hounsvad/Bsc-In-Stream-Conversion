@@ -12,7 +12,9 @@ namespace Bsc_In_Stream_Conversion.Controllers
     {
         private IMQTTClientManager mqttClientManager;
         private SocketRequestHandler socketRequestHandler;
-        
+
+        private static int counter = 0;
+
 
         public SubscribeHub(IMQTTClientManager mqttClientManager, SocketRequestHandler socketRequestHandler)
         {
@@ -31,6 +33,12 @@ namespace Bsc_In_Stream_Conversion.Controllers
                 Console.WriteLine(e.Message);
                 Console.WriteLine(e.StackTrace);
             }
+        }
+        public override Task OnConnectedAsync()
+        {
+            ++counter;
+            Console.WriteLine("Counter: " + counter);
+            return base.OnConnectedAsync();
         }
     }
 }
