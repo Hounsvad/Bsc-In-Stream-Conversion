@@ -14,11 +14,13 @@ namespace MeasurementScraper
                 Dictionary<int, List<string>> entriesList = new Dictionary<int, List<string>>();
                 var InputDirectoryPath = args[0];
                 var OutputDirectoryPath = args[1];
-                using (var sw = new StreamWriter(new FileStream(OutputDirectoryPath + "\\combinedMeasurementOutputClientMeasurement.csv", FileMode.OpenOrCreate)))
+                var OutputFileName = args.Length >= 3 ? args[2] : "combinedMeasurementOutputClientMeasurement.csv";
+                if(args.Length == 3)
+                using (var sw = new StreamWriter(new FileStream(OutputDirectoryPath + OutputFileName , FileMode.OpenOrCreate)))
                 {
 
                     var files = Directory.EnumerateFiles(InputDirectoryPath, "*.txt");
-                    sw.WriteLine("Threadcount,Ticks,ThreadID,ReadingID");
+                    sw.WriteLine("Threadcount,Milliseconds,ThreadID,ReadingID");
                     sw.Flush();
                     var filecount = 0;
                     foreach (string file in files)
