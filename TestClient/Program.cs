@@ -130,7 +130,7 @@ namespace TestClient
 
                 try
                 {
-                    await conn.InvokeAsync("SubscribeTo", "Hounsvad%2Fpi%2Fcputemp%2FDEG_C", "K");
+                    await conn.InvokeAsync("SubscribeTo", "Hounsvad%2Fbsc%2Ftemp%2FDEG_C", "K");
                 }
                 catch (Exception e)
                 {
