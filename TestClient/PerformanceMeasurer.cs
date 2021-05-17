@@ -21,7 +21,7 @@ namespace TestClient
 
         public static void Log(ClientMessageDto msg, long timeOfRetrieval, Guid clientId)
         {
-            msg.TimeOfReading = timeOfRetrieval - msg.TimeOfReading;
+            msg.TimeOfReading = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() - msg.TimeOfReading;
             _lock.WaitOne();
             log.Enqueue((clientId, msg));
             _lock.Release();
