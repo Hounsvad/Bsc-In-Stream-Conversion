@@ -27,7 +27,7 @@ MessageCounter = 0
 while True:
     temp = client.get_temp()
     MessageCounter = MessageCounter + 1
+    #client.publish_message("Hounsvad/pi/cputemp/DEG_C", "{\"TimeOfReading\":"+str(round(time.time()*1000))+",\"Reading\":"+ str(temp)+",\"ReadingId\":\"" + str(uuid.uuid4())+"\",\"MessageCounterId:\"" + str(MessageCounter))
     text = f'{{"TimeOfReading":{str(round(time.time()*1000))},"Reading":{str(temp)},"ReadingId":"{str(uuid.uuid4())}","MessageCounterId":{str(MessageCounter)}}}'
-    client.publish_message("Hounsvad/pi/cputemp/DEG_C", text)
-
-    time.sleep(0.1)
+    client.publish_message("Hounsvad/bsc/temp/DEG_C", text)
+    time.sleep(.1)
