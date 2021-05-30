@@ -43,7 +43,10 @@ namespace TestClient
             Console.WriteLine($"Starting {PerformanceMeasurer.StartTime}...");
 
             while(conns.Count < threadCount) { 
-                await CreateClient();
+                for(int i = 1; i <= 10; i++)
+                {
+                    await CreateClient(i);
+                }
             }
 
             await Task.Delay(1000); //Delay the start of the logging to prevent outliers
@@ -73,10 +76,9 @@ namespace TestClient
                     }
                 }
             }
-
         }
 
-        private static async Task CreateClient()
+        private static async Task CreateClient(int topic)
         {
             Console.WriteLine($"Live clients: {conns.Count + 1}");
             await Task.Run(async () =>
@@ -130,7 +132,7 @@ namespace TestClient
 
                 try
                 {
-                    await conn.InvokeAsync("SubscribeTo", "Hounsvad%2Fpi%2Fcputemp%2FDEG_C", "K");
+                    await conn.InvokeAsync("SubscribeTo", "Hounsvad%2Fbsc%2Ftemp" + topic.ToString() + "%2FDEG_C", "K");
                 }
                 catch (Exception e)
                 {
